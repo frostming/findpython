@@ -1,0 +1,6 @@
+.pdm.toml
+*.py[cod]
+__pycache__/
+venv/
+.tox/
+.vscode/

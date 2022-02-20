@@ -1,0 +1,63 @@
+[project]
+name = "findpython"
+version = "0.1.0"
+description = "A utility to find python versions on your system"
+authors = [
+    {name = "Frost Ming", email = "mianghong@gmail.com"},
+]
+dependencies = [
+    "packaging==21.3",
+]
+requires-python = ">=3.7"
+license = {text = "MIT"}
+readme = "README.md"
+
+[project.urls]
+Homepage = ""
+
+[project.scripts]
+findpython = "findpython.__main__:main"
+
+[tool.pdm]
+package-dir = "src"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "vendoring; python_version >= '3.8'"
+]
+
+tests = ["pytest"]
+
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+[tool.black]
+line-length = 90
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | src/pythonfinder/_vendor
+)
+'''
+
+[tool.isort]
+profile = "black"
+atomic = true
+filter_files = true
+known_first_party = ["pythonfinder"]
+
+[tool.vendoring]
+destination = "src/findpython/_vendor/"
+requirements = "src/findpython/_vendor/vendor.txt"
+namespace = "findpython._vendor"
+
+protected-files = ["__init__.py", "README.md", "vendor.txt"]
