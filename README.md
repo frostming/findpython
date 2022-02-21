@@ -3,8 +3,8 @@
 _A utility to find python versions on your system._
 
 [![Tests](https://github.com/frostming/findpython/actions/workflows/ci.yml/badge.svg)](https://github.com/frostming/findpython/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/pdm?logo=python&logoColor=%23cccccc?style=flat-square)](https://pypi.org/project/findpython)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/findpython?style=flat-square)](https://pypi.org/project/findpython)
+[![PyPI](https://img.shields.io/pypi/v/findpython?logo=python&logoColor=%23cccccc&style=flat-square)](https://pypi.org/project/findpython)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/findpython?logo=python&logoColor=%23cccccc&style=flat-square)](https://pypi.org/project/findpython)
 [![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet?style=flat-square)](https://github.com/frostming/findpython)
 
 ## Description
