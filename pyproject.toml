@@ -13,7 +13,7 @@ license = {text = "MIT"}
 readme = "README.md"
 
 [project.urls]
-Homepage = ""
+Homepage = "https://github.com/frostming/findpython"
 
 [project.scripts]
 findpython = "findpython.__main__:main"
