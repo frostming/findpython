@@ -3,11 +3,12 @@
     ~~~~~~~~~~
     A utility to find python versions on your system
 """
-
-__version__ = "0.1.0"
+from __future__ import annotations
 
 from findpython.finder import Finder
 from findpython.python import PythonVersion
+
+__version__ = "0.1.0"
 
 
 def find(*args, **kwargs) -> PythonVersion | None:
