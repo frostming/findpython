@@ -1,13 +1,15 @@
-from pathlib import Path
+import stat
 import sys
+from pathlib import Path
 
-from findpython.finder import Finder
 import pytest
 
+from findpython.finder import Finder
+from findpython.providers import ALL_PROVIDERS
+from findpython.providers.asdf import AsdfProvider
 
-pytestmark = pytest.mark.skipif(
-    sys.platform == "win32", reason="Skip POSIX tests on Windows"
-)
+if sys.platform == "win32":
+    pytest.skip("Skip POSIX tests on Windows", allow_module_level=True)
 
 
 def test_find_python_resolve_symlinks(mocked_python, tmp_path, switch):
@@ -21,6 +23,7 @@ def test_find_python_resolve_symlinks(mocked_python, tmp_path, switch):
 
 
 def test_find_python_from_asdf(mocked_python, tmp_path, monkeypatch):
+    ALL_PROVIDERS.append(AsdfProvider)
     python = mocked_python.add_python(
         tmp_path / ".asdf/installs/python/3.8/bin/python", "3.8.0"
     )
@@ -28,3 +31,15 @@ def test_find_python_from_asdf(mocked_python, tmp_path, monkeypatch):
     pythons = Finder().find_all(3, 8)
     assert len(pythons) == 2
     assert python in pythons
+
+
+def test_find_python_exclude_unreadable(mocked_python, tmp_path):
+    python = Path(tmp_path / "python3.8")
+    python.chmod(python.stat().st_mode & ~stat.S_IRUSR)
+    try:
+        finder = Finder()
+        all_pythons = finder.find_all()
+        assert len(all_pythons) == 2
+        assert python not in [version.executable for version in all_pythons]
+    finally:
+        python.chmod(0o744)

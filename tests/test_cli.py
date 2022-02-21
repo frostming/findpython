@@ -16,4 +16,4 @@ def test_cli_find_python_by_version(mocked_python, capsys, tmp_path):
     out, _ = capsys.readouterr()
     line = out.strip()
     assert line.startswith("python3.8 3.8.0")
-    assert line.split()[-1] == str(tmp_path / "python3.8")
+    assert line.endswith(str(tmp_path / "python3.8"))

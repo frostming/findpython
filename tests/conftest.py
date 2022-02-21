@@ -1,7 +1,10 @@
 from pathlib import Path
-from findpython.python import PythonVersion
-from packaging.version import parse
+
 import pytest
+from packaging.version import parse
+
+from findpython.providers import ALL_PROVIDERS, PathProvider
+from findpython.python import PythonVersion
 
 
 class _MockRegistry:
@@ -41,6 +44,7 @@ def mocked_python(tmp_path, monkeypatch):
     monkeypatch.setattr(
         "findpython.providers.base.BaseProvider.version_maker", mocked.version_maker
     )
+    ALL_PROVIDERS[:] = [PathProvider]
     monkeypatch.setenv("PATH", str(tmp_path))
     return mocked
 

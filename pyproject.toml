@@ -53,7 +53,7 @@ exclude = '''
 profile = "black"
 atomic = true
 filter_files = true
-known_first_party = ["pythonfinder"]
+known_first_party = ["findpython"]
 
 [tool.vendoring]
 destination = "src/findpython/_vendor/"

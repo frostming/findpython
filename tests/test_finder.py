@@ -1,8 +1,11 @@
 import os
-import stat
 from pathlib import Path
-from findpython import Finder
+
 from packaging.version import Version
+
+from findpython import Finder
+from findpython.providers import ALL_PROVIDERS
+from findpython.providers.pyenv import PyenvProvider
 
 
 def test_find_pythons(mocked_python, tmp_path):
@@ -55,18 +58,6 @@ def test_find_python_with_devrelease(mocked_python, tmp_path):
     assert python == finder.find(dev=True)
 
 
-def test_find_python_exclude_unreadable(mocked_python, tmp_path):
-    python = Path(tmp_path / "python3.8")
-    python.chmod(python.stat().st_mode & ~stat.S_IRUSR)
-    try:
-        finder = Finder()
-        all_pythons = finder.find_all()
-        assert len(all_pythons) == 2
-        assert python not in [version.executable for version in all_pythons]
-    finally:
-        python.chmod(0o744)
-
-
 def test_find_python_with_non_existing_path(mocked_python, monkeypatch):
     monkeypatch.setenv("PATH", "/non/existing/path" + os.pathsep + os.environ["PATH"])
     finder = Finder()
@@ -111,6 +102,7 @@ def test_find_python_deduplicate_same_interpreter(mocked_python, tmp_path, switc
 
 
 def test_find_python_from_pyenv(mocked_python, tmp_path, monkeypatch):
+    ALL_PROVIDERS.append(PyenvProvider)
     python = mocked_python.add_python(
         tmp_path / ".pyenv/versions/3.8/bin/python", "3.8.0"
     )
