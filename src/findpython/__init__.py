@@ -8,7 +8,7 @@ from __future__ import annotations
 from findpython.finder import Finder
 from findpython.python import PythonVersion
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def find(*args, **kwargs) -> PythonVersion | None:
