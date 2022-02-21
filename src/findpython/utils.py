@@ -29,9 +29,9 @@ PYTHON_IMPLEMENTATIONS = (
     "micropython",
 )
 if WINDOWS:
-    KNOWN_EXTS = (".exe", ".py", ".bat", "")
+    KNOWN_EXTS = (".exe", "", ".py", ".bat")
 else:
-    KNOWN_EXTS = (".sh", ".bash", ".csh", ".zsh", ".fish", ".py", "")
+    KNOWN_EXTS = ("", ".sh", ".bash", ".csh", ".zsh", ".fish", ".py")
 PY_MATCH_STR = (
     r"((?P<implementation>{0})(?:\d?(?:\.\d[cpm]{{0,3}}))?"
     r"(?:-?[\d\.]+)*(?!w))(?:{1})$".format(
@@ -133,3 +133,10 @@ def parse_major(version: str) -> dict[str, int | bool | None] | None:
     if rv["architecture"]:
         rv["architecture"] = f"{rv['architecture']}bit"
     return rv
+
+
+def get_suffix_preference(name: str) -> int:
+    for i, suffix in enumerate(KNOWN_EXTS):
+        if suffix and name.endswith(suffix):
+            return i
+    return KNOWN_EXTS.index("")

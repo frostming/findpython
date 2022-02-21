@@ -35,7 +35,7 @@ class Pep514Provider(BaseProvider):
             except AttributeError:
                 continue
             if path.exists():
-                py_ver = PythonVersion(
+                py_ver = self.version_maker(
                     path,
                     parse_version(version.info.version),
                     getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),

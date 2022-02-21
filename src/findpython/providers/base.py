@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import logging
 from pathlib import Path
-from typing import Iterable, Type, TypeVar
+from typing import Callable, Iterable, Type, TypeVar
 
 from findpython.python import PythonVersion
 from findpython.utils import path_is_python, path_is_readable
@@ -15,6 +15,8 @@ logger = logging.getLogger("findpython")
 class BaseProvider(metaclass=abc.ABCMeta):
     """The base class for python providers"""
 
+    version_maker: Callable[..., PythonVersion] = PythonVersion
+
     @abc.abstractclassmethod
     def create(cls: Type[T]) -> T | None:
         """Return an instance of the provider or None if it is not available"""
@@ -25,9 +27,9 @@ class BaseProvider(metaclass=abc.ABCMeta):
         """Return the python versions found by the provider"""
         pass
 
-    @staticmethod
+    @classmethod
     def find_pythons_from_path(
-        path: Path, as_interpreter: bool = False
+        cls, path: Path, as_interpreter: bool = False
     ) -> Iterable[PythonVersion]:
         """A general helper method to return pythons under a given path.
 
@@ -40,7 +42,7 @@ class BaseProvider(metaclass=abc.ABCMeta):
             logger.debug("Invalid path or unreadable: %s", path)
             return iter([])
         return (
-            PythonVersion(
+            cls.version_maker(
                 child.absolute(),
                 _interpreter=child.absolute() if as_interpreter else None,
             )

@@ -6,19 +6,28 @@ from typing import Callable, Iterable
 
 from findpython.providers import ALL_PROVIDERS, BaseProvider
 from findpython.python import PythonVersion
-from findpython.utils import parse_major
+from findpython.utils import get_suffix_preference, parse_major
 
 logger = logging.getLogger("findpython")
 
 
 class Finder:
-    """Find python versions on the system."""
+    """Find python versions on the system.
+
+    :param resolve_symlinks: Whether to resolve symlinks.
+    :param no_same_file: Whether to deduplicate with the python executable content.
+    :param no_same_interpreter: Whether to deduplicate with the python executable path.
+    """
 
     def __init__(
-        self, resolve_symlinks: bool = False, no_same_file: bool = False
+        self,
+        resolve_symlinks: bool = False,
+        no_same_file: bool = False,
+        no_same_interpreter: bool = False,
     ) -> None:
         self.resolve_symlinks = resolve_symlinks
         self.no_same_file = no_same_file
+        self.no_same_interpreter = no_same_interpreter
 
         self._providers = self.setup_providers()
 
@@ -123,15 +132,23 @@ class Finder:
         version_matcher: Callable[[PythonVersion], bool],
     ) -> list[PythonVersion]:
         def dedup_key(python_version: PythonVersion) -> str:
+            if self.no_same_interpreter:
+                return python_version.interpreter.as_posix()
             if self.no_same_file:
                 return python_version.binary_hash()
             if self.resolve_symlinks:
                 return python_version.real_path.as_posix()
             return python_version.executable.as_posix()
 
+        def sort_key(python_version: PythonVersion) -> tuple[int, int]:
+            return (
+                get_suffix_preference(python_version.name),
+                -len(python_version.executable.as_posix()),
+            )
+
         result: dict[str, PythonVersion] = {}
 
-        for python_version in python_versions:
+        for python_version in sorted(python_versions, key=sort_key):
             key = dedup_key(python_version)
             if (
                 key not in result

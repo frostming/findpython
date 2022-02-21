@@ -46,7 +46,7 @@ class PythonVersion:
         return self.executable.name
 
     @property
-    def interpereter(self) -> Path:
+    def interpreter(self) -> Path:
         if self._interpreter is None:
             self._interpreter = Path(self._get_interpreter())
         return self._interpreter
@@ -161,7 +161,7 @@ class PythonVersion:
         script = "import platform; print(platform.architecture()[0])"
         return self._run_script(script).strip()
 
-    def _get_interpereter(self) -> str:
+    def _get_interpreter(self) -> str:
         script = "import sys; print(sys.executable)"
         return self._run_script(script).strip()
 

@@ -40,6 +40,11 @@ def cli(argv: List[str] | None = None) -> int:
         action="store_true",
         help="Eliminate the duplicated results with the same file contents",
     )
+    parser.add_argument(
+        "--no-same-python",
+        action="store_true",
+        help="Eliminate the duplicated results with the same sys.executable",
+    )
     parser.add_argument("version_spec", nargs="?", help="Python version spec or name")
 
     args = parser.parse_args(argv)
