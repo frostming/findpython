@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: pdm-project/setup-python@main
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.10
       - name: Build artifacts
@@ -21,9 +21,10 @@ jobs:
           python -m build
       - name: Test Build
         run: |
-          python3 -m venv fresh_env
+          python -m venv fresh_env
           . fresh_env/bin/activate
           pip install dist/*.whl
+          findpython --all
       - name: Upload to Pypi
         run: |
           pip install twine
