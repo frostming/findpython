@@ -25,15 +25,20 @@ class PythonVersion:
     def is_valid(self) -> bool:
         """Return True if the python is not broken."""
         try:
-            self._get_version()
+            v = self._get_version()
         except (OSError, subprocess.CalledProcessError):
             return False
+        if self._version is None:
+            self._version = v
         return True
 
     @property
     def real_path(self) -> Path:
         """Resolve the symlink if possible and return the real path."""
-        return self.executable.resolve()
+        try:
+            return self.executable.resolve()
+        except OSError:
+            return self.executable
 
     @property
     def name(self) -> str:
@@ -144,7 +149,7 @@ class PythonVersion:
         )
 
     def __str__(self) -> str:
-        return f"{self.name} {self.version} ({self.architecture}) @ {self.executable}"
+        return f"{self.name} {self.version} @ {self.executable}"
 
     def _get_version(self) -> Version:
         """Get the version of the python."""
