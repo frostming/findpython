@@ -28,6 +28,8 @@ class PythonVersion:
             v = self._get_version()
         except (OSError, subprocess.CalledProcessError):
             return False
+        if not isinstance(v, Version):
+            return False
         if self._version is None:
             self._version = v
         return True
