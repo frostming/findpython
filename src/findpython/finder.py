@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import operator
-from typing import Iterable
+from typing import Callable, Iterable
 
 from findpython.providers import ALL_PROVIDERS, BaseProvider
 from findpython.python import PythonVersion
@@ -82,10 +82,8 @@ class Finder:
             architecture,
         )
         # Deduplicate with the python executable path
-        matched_python = sorted(
-            filter(version_matcher, set(self._find_all_python_versions()))
-        )
-        return self._dedup(matched_python)
+        matched_python = set(self._find_all_python_versions())
+        return self._dedup(matched_python, version_matcher)
 
     def find(
         self,
@@ -119,7 +117,11 @@ class Finder:
         for provider in self._providers:
             yield from provider.find_pythons()
 
-    def _dedup(self, python_versions: list[PythonVersion]) -> list[PythonVersion]:
+    def _dedup(
+        self,
+        python_versions: Iterable[PythonVersion],
+        version_matcher: Callable[[PythonVersion], bool],
+    ) -> list[PythonVersion]:
         def dedup_key(python_version: PythonVersion) -> str:
             if self.no_same_file:
                 return python_version.binary_hash()
@@ -127,15 +129,14 @@ class Finder:
                 return python_version.real_path.as_posix()
             return python_version.executable.as_posix()
 
-        if not self.resolve_symlinks and not self.no_same_file:
-            python_versions.reverse()
-        else:
-            python_versions = list(
-                reversed(
-                    {
-                        dedup_key(python_version): python_version
-                        for python_version in python_versions
-                    }.values()
-                )
-            )
-        return python_versions
+        result: dict[str, PythonVersion] = {}
+
+        for python_version in python_versions:
+            key = dedup_key(python_version)
+            if (
+                key not in result
+                and python_version.is_valid()
+                and version_matcher(python_version)
+            ):
+                result[key] = python_version
+        return sorted(result.values(), reverse=True)

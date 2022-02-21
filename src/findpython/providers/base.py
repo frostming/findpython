@@ -39,7 +39,7 @@ class BaseProvider(metaclass=abc.ABCMeta):
         if not path.is_dir() or not path_is_readable(path):
             logger.debug("Invalid path or unreadable: %s", path)
             return iter([])
-        python_versions = (
+        return (
             PythonVersion(
                 child.absolute(),
                 _interpreter=child.absolute() if as_interpreter else None,
@@ -47,4 +47,3 @@ class BaseProvider(metaclass=abc.ABCMeta):
             for child in path.iterdir()
             if path_is_python(child)
         )
-        return filter(lambda p: p.is_valid(), python_versions)

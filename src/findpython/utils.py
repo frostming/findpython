@@ -28,17 +28,18 @@ PYTHON_IMPLEMENTATIONS = (
     "pyston",
     "micropython",
 )
+if WINDOWS:
+    KNOWN_EXTS = (".exe", ".py", ".bat", "")
+else:
+    KNOWN_EXTS = (".sh", ".bash", ".csh", ".zsh", ".fish", ".py", "")
 PY_MATCH_STR = (
-    r"((?P<implementation>{0})(?:\d?(?:\.\d[cpm]{{0,3}}))?(?:-?[\d\.]+)*(?!w))$".format(
-        "|".join(PYTHON_IMPLEMENTATIONS)
+    r"((?P<implementation>{0})(?:\d?(?:\.\d[cpm]{{0,3}}))?"
+    r"(?:-?[\d\.]+)*(?!w))(?:{1})$".format(
+        "|".join(PYTHON_IMPLEMENTATIONS),
+        "|".join(KNOWN_EXTS),
     )
 )
 RE_MATCHER = re.compile(PY_MATCH_STR)
-
-if WINDOWS:
-    KNOWN_EXTS = ("exe", "py", "bat", "")
-else:
-    KNOWN_EXTS = ("sh", "bash", "csh", "zsh", "fish", "py", "")
 
 
 def path_is_readable(path: Path) -> bool:
@@ -92,7 +93,7 @@ def path_is_python(path: Path) -> bool:
     """
     if not path_is_readable(path) or not path.is_file():
         return False
-    return path_is_known_executable(path) and looks_like_python(path.stem)
+    return path_is_known_executable(path) and looks_like_python(path.name)
 
 
 @lru_cache(maxsize=1024)
