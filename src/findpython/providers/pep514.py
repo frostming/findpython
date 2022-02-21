@@ -39,6 +39,7 @@ class Pep514Provider(BaseProvider):
                     path,
                     parse_version(version.info.version),
                     getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),
+                    path,
                 )
                 if py_ver.is_valid():
                     yield py_ver

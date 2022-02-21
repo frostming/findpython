@@ -90,9 +90,9 @@ def path_is_python(path: Path) -> bool:
     :return: Whether the provided path is an executable path to python.
     :rtype: bool
     """
-    if not path_is_readable(path) or not path.resolve().is_file():
+    if not path_is_readable(path) or not path.is_file():
         return False
-    return path_is_known_executable(path) and looks_like_python(path.name)
+    return path_is_known_executable(path) and looks_like_python(path.stem)
 
 
 @lru_cache(maxsize=1024)

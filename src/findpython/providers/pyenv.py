@@ -28,5 +28,5 @@ class PyenvProvider(BaseProvider):
             if version.is_dir():
                 bindir = version / "bin"
                 if not bindir.exists():
-                    bindir = version / "Scripts"
-                yield from self.find_pythons_from_path(bindir)
+                    bindir = version
+                yield from self.find_pythons_from_path(bindir, True)

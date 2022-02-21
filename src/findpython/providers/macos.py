@@ -23,4 +23,4 @@ class MacOSProvider(BaseProvider):
     def find_pythons(self) -> Iterable[PythonVersion]:
         for version in self.INSTALL_BASE.iterdir():
             if version.is_dir():
-                yield from self.find_pythons_from_path(version / "bin")
+                yield from self.find_pythons_from_path(version / "bin", True)

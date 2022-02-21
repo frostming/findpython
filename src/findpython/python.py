@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import dataclasses as dc
+import logging
+import subprocess
 from pathlib import Path
 
 from packaging.version import Version
@@ -8,17 +10,24 @@ from packaging.version import parse as parse_version
 
 from findpython.utils import get_binary_hash, subprocess_output
 
+logger = logging.getLogger("findpython")
+
 
 @dc.dataclass
 class PythonVersion:
     """The single Python version object found by pythonfinder."""
 
     executable: Path
-    _version: Version | None = dc.field(default=None, hash=False, compare=False)
-    _architecture: str | None = dc.field(default=None, compare=False, hash=False)
+    _version: Version | None = None
+    _architecture: str | None = None
+    _interpreter: Path | None = None
 
     def is_valid(self) -> bool:
         """Return True if the python is not broken."""
+        try:
+            self._get_version()
+        except (OSError, subprocess.CalledProcessError):
+            return False
         return True
 
     @property
@@ -30,6 +39,12 @@ class PythonVersion:
     def name(self) -> str:
         """Return the name of the python."""
         return self.executable.name
+
+    @property
+    def interpereter(self) -> Path:
+        if self._interpreter is None:
+            self._interpreter = Path(self._get_interpreter())
+        return self._interpreter
 
     @property
     def version(self) -> Version:
@@ -141,9 +156,14 @@ class PythonVersion:
         script = "import platform; print(platform.architecture()[0])"
         return self._run_script(script).strip()
 
+    def _get_interpereter(self) -> str:
+        script = "import sys; print(sys.executable)"
+        return self._run_script(script).strip()
+
     def _run_script(self, script: str) -> str:
         """Run a script and return the output."""
         command = [self.executable.as_posix(), "-c", script]
+        logger.debug("Running script: %s", command)
         return subprocess_output(*command)
 
     def __lt__(self, other: PythonVersion) -> bool:

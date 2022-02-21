@@ -26,13 +26,24 @@ class BaseProvider(metaclass=abc.ABCMeta):
         pass
 
     @staticmethod
-    def find_pythons_from_path(path: Path) -> Iterable[PythonVersion]:
-        """A general helper method to return pythons under a given path."""
+    def find_pythons_from_path(
+        path: Path, as_interpreter: bool = False
+    ) -> Iterable[PythonVersion]:
+        """A general helper method to return pythons under a given path.
+
+        :param path: The path to search for pythons
+        :param as_interpreter: Use the path as the interpreter path.
+            If the pythons might be a wrapper script, don't set this to True.
+        :returns: An iterable of PythonVersion objects
+        """
         if not path.is_dir() or not path_is_readable(path):
             logger.debug("Invalid path or unreadable: %s", path)
             return iter([])
         python_versions = (
-            PythonVersion(child.absolute())
+            PythonVersion(
+                child.absolute(),
+                _interpreter=child.absolute() if as_interpreter else None,
+            )
             for child in path.iterdir()
             if path_is_python(child)
         )
