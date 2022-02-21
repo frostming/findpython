@@ -17,7 +17,7 @@ class PathProvider(BaseProvider):
 
     @classmethod
     def create(cls: Type[T]) -> T | None:
-        paths = [Path(path) for path in os.getenv("PATH", "").split(os.pathsep)]
+        paths = [Path(path) for path in os.getenv("PATH", "").split(os.pathsep) if path]
         return cls(paths)
 
     def find_pythons(self) -> Iterable[PythonVersion]:

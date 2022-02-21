@@ -2,6 +2,11 @@
 
 _A utility to find python versions on your system._
 
+[![Tests](https://github.com/frostming/findpython/actions/workflows/ci.yml/badge.svg)](https://github.com/frostming/findpython/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/pdm?logo=python&logoColor=%23cccccc?style=flat-square)](https://pypi.org/project/findpython)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/findpython?style=flat-square)](https://pypi.org/project/findpython)
+[![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet?style=flat-square)](https://github.com/frostming/findpython)
+
 ## Description
 
 This library is a rewrite of [pythonfinder] project by [@techalchemy][techalchemy].
@@ -40,9 +45,8 @@ pip install findpython
 
 In addition, FindPython provides a CLI interface to find python versions:
 
-```bash
-findpython -h
-usage: findpython [-h] [-V] [-a] [--resolve-symlink] [-v] [--no-same-file] [version_spec]
+```
+usage: findpython [-h] [-V] [-a] [--resolve-symlink] [-v] [--no-same-file] [--no-same-python] [version_spec]
 
 Find python files in a directory
 
@@ -56,6 +60,7 @@ options:
   --resolve-symlink  Resolve all symlinks
   -v, --verbose      Verbose output
   --no-same-file     Eliminate the duplicated results with the same file contents
+  --no-same-python   Eliminate the duplicated results with the same sys.executable
 ```
 
 ## Integration
