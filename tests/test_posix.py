@@ -18,7 +18,7 @@ def test_find_python_resolve_symlinks(mocked_python, tmp_path, switch):
     python = mocked_python.add_python(link, "3.7.0")
     finder = Finder(resolve_symlinks=switch)
     all_pythons = finder.find_all()
-    assert len(all_pythons) == 3 if switch else 4
+    assert len(all_pythons) == (3 if switch else 4)
     assert (python in all_pythons) is not switch
 
 

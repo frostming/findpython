@@ -1,6 +1,6 @@
 [project]
 name = "findpython"
-version = "0.1.1"
+version = "0.1.2"
 description = "A utility to find python versions on your system"
 authors = [
     {name = "Frost Ming", email = "mianghong@gmail.com"},

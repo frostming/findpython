@@ -3,13 +3,12 @@ from __future__ import annotations
 import hashlib
 import os
 import re
-import subprocess
 import sys
 from functools import lru_cache
 from pathlib import Path
 
 VERSION_RE = re.compile(
-    r"(?P<major>\d+)(?:\.(?P<minor>\d+))?(?:\.(?P<patch>[0-9]+))?\.?"
+    r"(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?"
     r"(?:(?P<prerel>[abc]|rc|dev)(?:(?P<prerelversion>\d+(?:\.\d+)*))?)"
     r"?(?P<postdev>(\.post(?P<post>\d+))?(\.dev(?P<dev>\d+))?)?"
     r"(?:-(?P<architecture>32|64))?"
@@ -33,8 +32,8 @@ if WINDOWS:
 else:
     KNOWN_EXTS = ("", ".sh", ".bash", ".csh", ".zsh", ".fish", ".py")
 PY_MATCH_STR = (
-    r"((?P<implementation>{0})(?:\d?(?:\.\d[cpm]{{0,3}}))?"
-    r"(?:-?[\d\.]+)*(?!w))(?:{1})$".format(
+    r"((?P<implementation>{0})(?:\d(?:\.?\d\d?[cpm]{{0,3}})?)?"
+    r"(?:-[\d\.]+)*(?!w))(?P<suffix>{1})$".format(
         "|".join(PYTHON_IMPLEMENTATIONS),
         "|".join(KNOWN_EXTS),
     )
@@ -94,19 +93,6 @@ def path_is_python(path: Path) -> bool:
     if not path_is_readable(path) or not path.is_file():
         return False
     return path_is_known_executable(path) and looks_like_python(path.name)
-
-
-@lru_cache(maxsize=1024)
-def subprocess_output(*args: str) -> str:
-    """
-    Run a command and return the output.
-
-    :param cmd: The command to run.
-    :type cmd: list[str]
-    :return: The output of the command.
-    :rtype: str
-    """
-    return subprocess.check_output(list(args)).decode("utf-8")
 
 
 @lru_cache(maxsize=1024)
