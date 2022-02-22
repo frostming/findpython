@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import os
 import re
-import subprocess
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -94,21 +93,6 @@ def path_is_python(path: Path) -> bool:
     if not path_is_readable(path) or not path.is_file():
         return False
     return path_is_known_executable(path) and looks_like_python(path.name)
-
-
-@lru_cache(maxsize=1024)
-def subprocess_output(*args: str) -> str:
-    """
-    Run a command and return the output.
-
-    :param cmd: The command to run.
-    :type cmd: list[str]
-    :return: The output of the command.
-    :rtype: str
-    """
-    return subprocess.check_output(
-        list(args), input=None, stderr=subprocess.DEVNULL
-    ).decode("utf-8")
 
 
 @lru_cache(maxsize=1024)

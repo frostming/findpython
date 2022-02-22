@@ -3,14 +3,16 @@ from __future__ import annotations
 import dataclasses as dc
 import logging
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 
 from packaging.version import Version
 from packaging.version import parse as parse_version
 
-from findpython.utils import get_binary_hash, subprocess_output
+from findpython.utils import get_binary_hash
 
 logger = logging.getLogger("findpython")
+GET_VERSION_TIMEOUT = 5
 
 
 @dc.dataclass
@@ -26,7 +28,7 @@ class PythonVersion:
         """Return True if the python is not broken."""
         try:
             v = self._get_version()
-        except (OSError, subprocess.CalledProcessError):
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
             return False
         if not isinstance(v, Version):
             return False
@@ -156,7 +158,7 @@ class PythonVersion:
     def _get_version(self) -> Version:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
-        version = self._run_script(script).strip()
+        version = self._run_script(script, timeout=GET_VERSION_TIMEOUT).strip()
         return parse_version(version)
 
     def _get_architecture(self) -> str:
@@ -167,11 +169,14 @@ class PythonVersion:
         script = "import sys; print(sys.executable)"
         return self._run_script(script).strip()
 
-    def _run_script(self, script: str) -> str:
+    @lru_cache(maxsize=1024)
+    def _run_script(self, script: str, timeout: float | None = None) -> str:
         """Run a script and return the output."""
         command = [self.executable.as_posix(), "-c", script]
         logger.debug("Running script: %s", command)
-        return subprocess_output(*command)
+        return subprocess.check_output(
+            command, input=None, stderr=subprocess.DEVNULL, timeout=timeout
+        ).decode("utf-8")
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
