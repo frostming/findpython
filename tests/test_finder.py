@@ -82,7 +82,7 @@ def test_find_python_deduplicate_same_file(mocked_python, tmp_path, switch):
 
     finder = Finder(no_same_file=switch)
     all_pythons = finder.find_all()
-    assert len(all_pythons) == 3 if switch else 4
+    assert len(all_pythons) == (3 if switch else 4)
     assert (new_python in all_pythons) is not switch
 
 
@@ -97,7 +97,7 @@ def test_find_python_deduplicate_same_interpreter(mocked_python, tmp_path, switc
 
     finder = Finder(no_same_interpreter=switch)
     all_pythons = finder.find_all()
-    assert len(all_pythons) == 3 if switch else 4
+    assert len(all_pythons) == (3 if switch else 4)
     assert (python in all_pythons) is not switch
 
 
