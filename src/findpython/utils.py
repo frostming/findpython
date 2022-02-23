@@ -33,7 +33,7 @@ else:
     KNOWN_EXTS = ("", ".sh", ".bash", ".csh", ".zsh", ".fish", ".py")
 PY_MATCH_STR = (
     r"((?P<implementation>{0})(?:\d(?:\.?\d\d?[cpm]{{0,3}})?)?"
-    r"(?:-[\d\.]+)*(?!w))(?P<suffix>{1})$".format(
+    r"(?:(?<=\d)-[\d\.]+)*(?!w))(?P<suffix>{1})$".format(
         "|".join(PYTHON_IMPLEMENTATIONS),
         "|".join(KNOWN_EXTS),
     )
