@@ -17,6 +17,11 @@ jobs:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10", "3.11.0-alpha - 3.11.0"]
         os: [ubuntu-latest, windows-latest, macos-latest]
+        arch: [x64]
+        include:
+          - python-version: "3.10"
+            os: windows-latest
+            arch: x86
 
     steps:
       - uses: actions/checkout@v2
@@ -24,6 +29,7 @@ jobs:
         uses: pdm-project/setup-pdm@main
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
       - name: Set Variables
         id: set_variables
         run: |
@@ -40,5 +46,7 @@ jobs:
 
       - name: Install packages
         run: pdm install
+      - name: Run Integration
+        run: pdm run findpython --all -v
       - name: Run Tests
         run: pdm run pytest tests
