@@ -5,6 +5,7 @@ import logging
 import subprocess
 from functools import lru_cache
 from pathlib import Path
+from threading import Timer
 
 from packaging.version import Version
 from packaging.version import parse as parse_version
@@ -174,9 +175,21 @@ class PythonVersion:
         """Run a script and return the output."""
         command = [self.executable.as_posix(), "-c", script]
         logger.debug("Running script: %s", command)
-        return subprocess.check_output(
-            command, input=None, stderr=subprocess.DEVNULL, timeout=timeout
-        ).decode("utf-8")
+        proc = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+        if timeout is not None:
+            t = Timer(timeout, proc.kill)
+            t.start()
+        stdout, _ = proc.communicate(b"")
+        if proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, command, stdout)
+        if timeout is not None:
+            t.cancel()
+        return stdout.decode("utf-8")
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
