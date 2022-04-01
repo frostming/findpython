@@ -31,7 +31,7 @@ class Pep514Provider(BaseProvider):
             if install_path is None:
                 continue
             try:
-                path = Path(install_path.value)
+                path = Path(install_path.executable_path)
             except AttributeError:
                 continue
             if path.exists():
