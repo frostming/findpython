@@ -1,6 +1,5 @@
 [project]
 name = "findpython"
-version = "0.1.5"
 description = "A utility to find python versions on your system"
 authors = [
     {name = "Frost Ming", email = "mianghong@gmail.com"},
@@ -11,6 +10,7 @@ dependencies = [
 requires-python = ">=3.7"
 license = {text = "MIT"}
 readme = "README.md"
+dynamic = ["version"]
 
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -28,6 +28,7 @@ findpython = "findpython.__main__:main"
 
 [tool.pdm]
 package-dir = "src"
+version = {from = "src/findpython/__init__.py"}
 
 [tool.pdm.dev-dependencies]
 dev = [
