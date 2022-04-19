@@ -7,14 +7,12 @@
 
 __all__ = ["Environment", "findall", "find", "findone"]
 
-from itertools import count
-from findpython._vendor.pep514tools._registry import (
+from findpython.pep514tools._registry import (
     open_source,
     REGISTRY_SOURCE_LM,
     REGISTRY_SOURCE_LM_WOW6432,
     REGISTRY_SOURCE_CU,
 )
-import re
 import sys
 
 # These tags are treated specially when the Company is 'PythonCore'

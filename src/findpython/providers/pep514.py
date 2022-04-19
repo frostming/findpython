@@ -4,8 +4,6 @@ import platform
 from pathlib import Path
 from typing import Iterable, Type
 
-from packaging.version import parse as parse_version
-
 from findpython.providers.base import BaseProvider, T
 from findpython.python import PythonVersion
 from findpython.utils import WINDOWS
@@ -23,7 +21,7 @@ class Pep514Provider(BaseProvider):
         return cls()
 
     def find_pythons(self) -> Iterable[PythonVersion]:
-        from findpython._vendor.pep514tools import findall as pep514_findall
+        from findpython.pep514tools import findall as pep514_findall
 
         env_versions = pep514_findall()
         for version in env_versions:
@@ -37,7 +35,7 @@ class Pep514Provider(BaseProvider):
             if path.exists():
                 py_ver = self.version_maker(
                     path,
-                    parse_version(version.info.version),
+                    None,
                     getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),
                     path,
                 )
