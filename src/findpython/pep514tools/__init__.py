@@ -8,4 +8,6 @@
 __author__ = "Steve Dower <steve.dower@python.org>"
 __version__ = "0.1.0"
 
-from findpython._vendor.pep514tools.environment import findall, find, findone
+from findpython.pep514tools.environment import findall, find, findone
+
+__all__ = ["findall", "find", "findone"]
