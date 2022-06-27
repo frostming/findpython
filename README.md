@@ -23,6 +23,14 @@ FindPython is installable via any kind of package manager including `pip`:
 pip install findpython
 ```
 
+<details>
+<summary>Expand this section to see findpython's availability in the package ecosystem</summary>
+
+<a href="https://repology.org/project/python:findpython/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/python:findpython.svg?header=python%3Afindpython" alt="Packaging status" align="right">
+</a>
+</details>
+
 ## Usage
 
 ```python
