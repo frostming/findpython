@@ -23,6 +23,7 @@ class PythonVersion:
     _version: Version | None = None
     _architecture: str | None = None
     _interpreter: Path | None = None
+    keep_symlink: bool = False
 
     def is_valid(self) -> bool:
         """Return True if the python is not broken."""

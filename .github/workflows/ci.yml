@@ -24,7 +24,7 @@ jobs:
             arch: x86
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up PDM
         uses: pdm-project/setup-pdm@main
         with:
@@ -36,7 +36,7 @@ jobs:
           echo "::set-output name=PIP_CACHE::$(pip cache dir)"
           echo "::set-output name=PDM_CACHE::$(pdm config cache_dir)"
       - name: Cache Packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ steps.set_variables.outputs.PIP_CACHE }}

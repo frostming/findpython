@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import pytest
 from packaging.version import Version
 
 from findpython import Finder
@@ -84,6 +85,20 @@ def test_find_python_deduplicate_same_file(mocked_python, tmp_path, switch):
     all_pythons = finder.find_all()
     assert len(all_pythons) == (3 if switch else 4)
     assert (new_python in all_pythons) is not switch
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Not supported on Windows")
+def test_find_python_deduplicate_symlinks(mocked_python, tmp_path):
+    python = mocked_python.add_python(tmp_path / "python3.9", "3.9.0")
+    (tmp_path / "python3").symlink_to(python.executable)
+    symlink1 = mocked_python.add_python(tmp_path / "python3", "3.9.0")
+    (tmp_path / "python").symlink_to(python.executable)
+    symlink2 = mocked_python.add_python(tmp_path / "python", "3.9.0", keep_symlink=True)
+    finder = Finder(resolve_symlinks=True)
+    all_pythons = finder.find_all()
+    assert python in all_pythons
+    assert symlink1 not in all_pythons
+    assert symlink2 in all_pythons
 
 
 def test_find_python_deduplicate_same_interpreter(mocked_python, tmp_path, switch):

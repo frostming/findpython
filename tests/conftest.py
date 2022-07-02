@@ -12,7 +12,12 @@ class _MockRegistry:
         self.versions = {}
 
     def add_python(
-        self, executable, version=None, architecture="64bit", interpreter=None
+        self,
+        executable,
+        version=None,
+        architecture="64bit",
+        interpreter=None,
+        keep_symlink=False,
     ):
         if version is not None:
             version = parse(version)
@@ -22,7 +27,9 @@ class _MockRegistry:
         executable.parent.mkdir(parents=True, exist_ok=True)
         executable.touch(exist_ok=True)
         executable.chmod(0o744)
-        py_ver = PythonVersion(executable, version, architecture, interpreter)
+        py_ver = PythonVersion(
+            executable, version, architecture, interpreter, keep_symlink
+        )
         if version is not None:
             py_ver._get_version = lambda: version
         self.versions[executable] = py_ver
