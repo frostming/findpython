@@ -26,15 +26,15 @@ Homepage = "https://github.com/frostming/findpython"
 [project.scripts]
 findpython = "findpython.__main__:main"
 
-[tool.pdm]
+[tool.pdm.version]
+source = "scm"
+write_to = "findpython/__version__.py"
+write_template = "__version__ = \"{}\"\n"
+
+[tool.pdm.build]
 package-dir = "src"
-version = {from = "src/findpython/__init__.py"}
 
 [tool.pdm.dev-dependencies]
-dev = [
-    "vendoring; python_version >= '3.8'"
-]
-
 tests = ["pytest"]
 
 [build-system]
@@ -64,9 +64,3 @@ atomic = true
 filter_files = true
 known_first_party = ["findpython"]
 
-[tool.vendoring]
-destination = "src/findpython/_vendor/"
-requirements = "src/findpython/_vendor/vendor.txt"
-namespace = "findpython._vendor"
-
-protected-files = ["__init__.py", "README.md", "vendor.txt"]

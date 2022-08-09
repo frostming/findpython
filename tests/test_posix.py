@@ -39,7 +39,7 @@ def test_find_python_exclude_unreadable(mocked_python, tmp_path):
     try:
         finder = Finder()
         all_pythons = finder.find_all()
-        assert len(all_pythons) == 2
+        assert len(all_pythons) == 2, all_pythons
         assert python not in [version.executable for version in all_pythons]
     finally:
         python.chmod(0o744)

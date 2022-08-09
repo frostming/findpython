@@ -57,11 +57,14 @@ def path_is_known_executable(path: Path) -> bool:
     :return: True if the path has chmod +x, or is a readable, known executable extension.
     :rtype: bool
     """
-    return (
-        os.access(str(path), os.X_OK)
-        or os.access(str(path), os.R_OK)
-        and path.suffix in KNOWN_EXTS
-    )
+    try:
+        return (
+            path.is_file()
+            and os.access(str(path), os.R_OK)
+            and (path.suffix in KNOWN_EXTS or os.access(str(path), os.X_OK))
+        )
+    except OSError:
+        return False
 
 
 @lru_cache(maxsize=1024)
@@ -90,12 +93,7 @@ def path_is_python(path: Path) -> bool:
     :return: Whether the provided path is an executable path to python.
     :rtype: bool
     """
-    try:
-        if not path_is_readable(path) or not path.is_file():
-            return False
-    except OSError:
-        return False
-    return path_is_known_executable(path) and looks_like_python(path.name)
+    return looks_like_python(path.name) and path_is_known_executable(path)
 
 
 @lru_cache(maxsize=1024)
