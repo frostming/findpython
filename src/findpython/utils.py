@@ -58,10 +58,10 @@ def path_is_known_executable(path: Path) -> bool:
     :rtype: bool
     """
     try:
-        return path.is_file() and (
-            os.access(str(path), os.X_OK)
-            or path.suffix in KNOWN_EXTS
+        return (
+            path.is_file()
             and os.access(str(path), os.R_OK)
+            and (path.suffix in KNOWN_EXTS or os.access(str(path), os.X_OK))
         )
     except OSError:
         return False

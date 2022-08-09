@@ -3,7 +3,6 @@ from pathlib import Path
 import pytest
 from packaging.version import parse
 
-from findpython import utils
 from findpython.providers import ALL_PROVIDERS, PathProvider
 from findpython.python import PythonVersion
 
@@ -54,13 +53,6 @@ def mocked_python(tmp_path, monkeypatch):
     )
     ALL_PROVIDERS[:] = [PathProvider]
     monkeypatch.setenv("PATH", str(tmp_path))
-    for function in (
-        utils.looks_like_python,
-        utils.path_is_known_executable,
-        utils.path_is_python,
-        utils.get_binary_hash,
-    ):
-        function.cache_clear()
     return mocked
 
 
