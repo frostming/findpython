@@ -5,7 +5,8 @@ import sys
 from argparse import ArgumentParser
 from typing import List
 
-from findpython import Finder, __version__
+from findpython import Finder
+from findpython.__version__ import __version__
 
 logger = logging.getLogger("findpython")
 
