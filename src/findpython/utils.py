@@ -46,6 +46,7 @@ def path_is_readable(path: Path) -> bool:
     return os.access(str(path), os.R_OK)
 
 
+@lru_cache(maxsize=1024)
 def path_is_known_executable(path: Path) -> bool:
     """
     Returns whether a given path is a known executable from known executable extensions
