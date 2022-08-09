@@ -28,7 +28,7 @@ findpython = "findpython.__main__:main"
 
 [tool.pdm.version]
 source = "scm"
-write_to = "src/findpython/__version__.py"
+write_to = "findpython/__version__.py"
 write_template = "__version__ = \"{}\"\n"
 
 [tool.pdm.build]
