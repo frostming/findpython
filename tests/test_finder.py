@@ -125,3 +125,12 @@ def test_find_python_from_pyenv(mocked_python, tmp_path, monkeypatch):
     pythons = Finder().find_all(3, 8)
     assert len(pythons) == 2
     assert python in pythons
+
+
+def test_find_python_skips_empty_pyenv(mocked_python, tmp_path, monkeypatch):
+    ALL_PROVIDERS.append(PyenvProvider)
+    pyenv_path = Path(tmp_path / ".pyenv")
+    pyenv_path.mkdir()
+    monkeypatch.setenv("PYENV_ROOT", str(pyenv_path))
+    all_pythons = Finder().find_all()
+    assert len(all_pythons) == 3
