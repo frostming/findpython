@@ -24,9 +24,11 @@ class PyenvProvider(BaseProvider):
         return cls(Path(pyenv_root))
 
     def find_pythons(self) -> Iterable[PythonVersion]:
-        for version in self.root.joinpath("versions").iterdir():
-            if version.is_dir():
-                bindir = version / "bin"
-                if not bindir.exists():
-                    bindir = version
-                yield from self.find_pythons_from_path(bindir, True)
+        versions_path = self.root.joinpath("versions")
+        if versions_path.exists():
+            for version in versions_path.iterdir():
+                if version.is_dir():
+                    bindir = version / "bin"
+                    if not bindir.exists():
+                        bindir = version
+                    yield from self.find_pythons_from_path(bindir, True)
