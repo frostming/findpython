@@ -6,8 +6,7 @@ import subprocess
 from functools import lru_cache
 from pathlib import Path
 
-from packaging.version import Version
-from packaging.version import parse as parse_version
+from packaging.version import Version, InvalidVersion
 
 from findpython.utils import get_binary_hash
 
@@ -29,9 +28,12 @@ class PythonVersion:
         """Return True if the python is not broken."""
         try:
             v = self._get_version()
-        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
-            return False
-        if not isinstance(v, Version):
+        except (
+            OSError,
+            subprocess.CalledProcessError,
+            subprocess.TimeoutExpired,
+            InvalidVersion,
+        ):
             return False
         if self._version is None:
             self._version = v
@@ -160,7 +162,7 @@ class PythonVersion:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
         version = self._run_script(script, timeout=GET_VERSION_TIMEOUT).strip()
-        return parse_version(version)
+        return Version(version)
 
     def _get_architecture(self) -> str:
         script = "import platform; print(platform.architecture()[0])"
