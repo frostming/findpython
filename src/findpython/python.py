@@ -6,7 +6,7 @@ import subprocess
 from functools import lru_cache
 from pathlib import Path
 
-from packaging.version import Version, InvalidVersion
+from packaging.version import InvalidVersion, Version
 
 from findpython.utils import get_binary_hash
 
@@ -162,6 +162,10 @@ class PythonVersion:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
         version = self._run_script(script, timeout=GET_VERSION_TIMEOUT).strip()
+        # Dev builds may produce version like `3.11.0+` and packaging.version
+        # will reject it. Here we just remove the part after `+`
+        # since it isn't critical for version comparison.
+        version = version.split("+")[0]
         return Version(version)
 
     def _get_architecture(self) -> str:
