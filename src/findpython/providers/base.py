@@ -38,7 +38,7 @@ class BaseProvider(metaclass=abc.ABCMeta):
             If the pythons might be a wrapper script, don't set this to True.
         :returns: An iterable of PythonVersion objects
         """
-        if not path.is_dir() or not path_is_readable(path):
+        if not path_is_readable(path) or not path.is_dir():
             logger.debug("Invalid path or unreadable: %s", path)
             return iter([])
         return (
