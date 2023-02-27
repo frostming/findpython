@@ -5,6 +5,7 @@ import logging
 import subprocess
 from functools import lru_cache
 from pathlib import Path
+import os
 
 from packaging.version import InvalidVersion, Version
 
@@ -181,9 +182,11 @@ class PythonVersion:
         """Run a script and return the output."""
         command = [self.executable.as_posix(), "-c", script]
         logger.debug("Running script: %s", command)
+        os.environ["PYTHONIOENCODING"] = "utf-8"
         return subprocess.check_output(
-            command, input=None, stderr=subprocess.DEVNULL, timeout=timeout
-        ).decode("utf-8")
+            command, input=None, stderr=subprocess.DEVNULL, timeout=timeout,
+            encoding="utf-8"
+        )
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
