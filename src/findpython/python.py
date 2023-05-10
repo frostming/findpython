@@ -183,10 +183,10 @@ class PythonVersion:
         logger.debug("Running script: %s", command)
         return subprocess.run(
             command,
+            stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             timeout=timeout,
             check=True,
-            capture_output=True,
             text=True,
         ).stdout
 
