@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import errno
 import hashlib
 import os
 import re
 import sys
 from functools import lru_cache
 from pathlib import Path
+from typing import Generator
 
 VERSION_RE = re.compile(
     r"(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?"
@@ -41,9 +43,18 @@ PY_MATCH_STR = (
 RE_MATCHER = re.compile(PY_MATCH_STR)
 
 
-def path_is_readable(path: Path) -> bool:
-    """Return True if the path is readable."""
-    return os.access(str(path), os.R_OK)
+def safe_iter_dir(path: Path) -> Generator[Path, None, None]:
+    """Iterate over a directory, returning an empty iterator if the path
+    is not a directory or is not readable.
+    """
+    if not os.access(str(path), os.R_OK) or not path.is_dir():
+        return
+    try:
+        yield from path.iterdir()
+    except OSError as exc:
+        if exc.errno == errno.EACCES:
+            return
+        raise
 
 
 @lru_cache(maxsize=1024)

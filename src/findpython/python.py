@@ -181,10 +181,14 @@ class PythonVersion:
         """Run a script and return the output."""
         command = [self.executable.as_posix(), "-c", script]
         logger.debug("Running script: %s", command)
-        return subprocess.check_output(
-            command, input=None, stderr=subprocess.DEVNULL, timeout=timeout,
-            text=True
-        )
+        return subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=timeout,
+            check=True,
+            text=True,
+        ).stdout
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
