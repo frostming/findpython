@@ -1,4 +1,4 @@
-.pdm.toml
+.pdm-python
 *.py[cod]
 __pycache__/
 venv/
