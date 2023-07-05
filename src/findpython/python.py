@@ -179,7 +179,7 @@ class PythonVersion:
     @lru_cache(maxsize=1024)
     def _run_script(self, script: str, timeout: float | None = None) -> str:
         """Run a script and return the output."""
-        command = [self.executable.as_posix(), "-c", script]
+        command = [self.executable.as_posix(), "-EsSc", script]
         logger.debug("Running script: %s", command)
         return subprocess.run(
             command,
