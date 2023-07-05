@@ -8,6 +8,7 @@ from findpython import register_provider
 from findpython.finder import Finder
 from findpython.providers.asdf import AsdfProvider
 from findpython.providers.pyenv import PyenvProvider
+from findpython.providers.rye import RyeProvider
 
 if sys.platform == "win32":
     pytest.skip("Skip POSIX tests on Windows", allow_module_level=True)
@@ -75,3 +76,14 @@ def test_find_python_from_provider(mocked_python, tmp_path, monkeypatch):
     pyenv_pythons = Finder(selected_providers=["pyenv"]).find_all(3, 8)
     assert len(pyenv_pythons) == 1
     assert python381 in pyenv_pythons
+
+
+def test_find_python_from_rye_provider(mocked_python, tmp_path, monkeypatch):
+    python310 = mocked_python.add_python(
+        tmp_path / ".rye/py/cpython@3.10.9/install/bin/python3", "3.10.9"
+    )
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    register_provider(RyeProvider)
+    pythons = Finder(selected_providers=["rye"]).find_all(3, 10)
+    assert python310 in pythons

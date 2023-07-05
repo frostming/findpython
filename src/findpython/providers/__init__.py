@@ -9,6 +9,7 @@ from findpython.providers.macos import MacOSProvider
 from findpython.providers.path import PathProvider
 from findpython.providers.pep514 import Pep514Provider
 from findpython.providers.pyenv import PyenvProvider
+from findpython.providers.rye import RyeProvider
 
 _providers: list[type[BaseProvider]] = [
     # General:
@@ -20,6 +21,7 @@ _providers: list[type[BaseProvider]] = [
     Pep514Provider,
     # MacOS only:
     MacOSProvider,
+    RyeProvider,
 ]
 
 ALL_PROVIDERS = {cls.name(): cls for cls in _providers}
