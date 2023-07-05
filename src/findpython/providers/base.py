@@ -18,6 +18,17 @@ class BaseProvider(metaclass=abc.ABCMeta):
     version_maker: Callable[..., PythonVersion] = PythonVersion
 
     @classmethod
+    def name(cls) -> str:
+        """Configuration name for this provider.
+
+        By default, the lowercase class name with 'provider' removed.
+        """
+        self_name = cls.__name__.lower()
+        if self_name.endswith("provider"):
+            self_name = self_name[:-len("provider")]
+        return self_name
+
+    @classmethod
     @abc.abstractmethod
     def create(cls: Type[T]) -> T | None:
         """Return an instance of the provider or None if it is not available"""
