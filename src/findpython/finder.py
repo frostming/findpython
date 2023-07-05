@@ -28,12 +28,14 @@ class Finder:
         self.resolve_symlinks = resolve_symlinks
         self.no_same_file = no_same_file
         self.no_same_interpreter = no_same_interpreter
+        self._allowed_provider_names = set()
 
         self._providers = self.setup_providers()
 
     def setup_providers(self) -> list[BaseProvider]:
         providers: list[BaseProvider] = []
         for provider_class in ALL_PROVIDERS:
+            self._allowed_provider_names.add(provider_class.name())
             provider = provider_class.create()
             if provider is None:
                 logger.debug("Provider %s is not available", provider_class.__name__)
@@ -45,6 +47,7 @@ class Finder:
         """Add provider to the provider list.
         If pos is given, it will be inserted at the given position.
         """
+        self._allowed_provider_names.add(provider.name())
         if pos is not None:
             self._providers.insert(pos, provider)
         else:
@@ -59,6 +62,7 @@ class Finder:
         dev: bool | None = None,
         name: str | None = None,
         architecture: str | None = None,
+        from_provider: list[str] | None = None,
     ) -> list[PythonVersion]:
         """
         Return all Python versions matching the given version criteria.
@@ -70,6 +74,7 @@ class Finder:
         :param dev: Whether the python is a devrelease.
         :param name: The name of the python.
         :param architecture: The architecture of the python.
+        :param from_provider: Providers to use (default: use all).
         :return: a list of PythonVersion objects
         """
         if isinstance(major, str):
@@ -100,7 +105,7 @@ class Finder:
             architecture,
         )
         # Deduplicate with the python executable path
-        matched_python = set(self._find_all_python_versions())
+        matched_python = set(self._find_all_python_versions(from_provider))
         return self._dedup(matched_python, version_matcher)
 
     def find(
@@ -112,6 +117,7 @@ class Finder:
         dev: bool | None = None,
         name: str | None = None,
         architecture: str | None = None,
+        from_provider: list[str] | None = None,
     ) -> PythonVersion | None:
         """
         Return the Python version that is closest to the given version criteria.
@@ -123,17 +129,38 @@ class Finder:
         :param dev: Whether the python is a devrelease.
         :param name: The name of the python.
         :param architecture: The architecture of the python.
+        :param from_provider: Providers to use (default: use all).
         :return: a Python object or None
         """
         return next(
-            iter(self.find_all(major, minor, patch, pre, dev, name, architecture)),
+            iter(self.find_all(major, minor, patch, pre, dev, name, architecture,
+                               from_provider)),
             None,
         )
 
-    def _find_all_python_versions(self) -> Iterable[PythonVersion]:
+    def _find_all_python_versions(
+        self,
+        from_provider: list[str] | None = None
+    ) -> Iterable[PythonVersion]:
         """Find all python versions on the system."""
-        for provider in self._providers:
+        for provider in self._filtered_providers(from_provider):
             yield from provider.find_pythons()
+
+    def _filtered_providers(
+        self,
+        from_provider: list[str] | None = None
+    ) -> Iterable[BaseProvider]:
+        if from_provider is None:
+            yield from self._providers
+            return
+
+        provider_map = {provider.name(): provider for provider in self._providers}
+        for provider_name in from_provider:
+            try:
+                yield provider_map[provider_name]
+            except KeyError:
+                if provider_name not in self._allowed_provider_names:
+                    raise ValueError(f"No such provider {provider_name}")
 
     def _dedup(
         self,

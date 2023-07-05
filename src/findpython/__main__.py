@@ -46,6 +46,11 @@ def cli(argv: List[str] | None = None) -> int:
         action="store_true",
         help="Eliminate the duplicated results with the same sys.executable",
     )
+    parser.add_argument(
+        "--provider",
+        nargs="+",
+        help="Select provider(s) to use",
+    )
     parser.add_argument("version_spec", nargs="?", help="Python version spec or name")
 
     args = parser.parse_args(argv)
@@ -56,7 +61,8 @@ def cli(argv: List[str] | None = None) -> int:
         find_func = finder.find_all
     else:
         find_func = finder.find
-    python_versions = find_func(args.version_spec)
+
+    python_versions = find_func(args.version_spec, from_provider=args.provider)
     if not python_versions:
         print("No matching python version found", file=sys.stderr)
         return 1
