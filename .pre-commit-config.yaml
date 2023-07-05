@@ -8,23 +8,23 @@ exclude: >
       \.venv|
       build|
       dist|
-      src/findpython/_vendor/.*\.py
+      src/findpython/_vendor/.*\.py|
+      src/findpython/pep514tools/_registry\.py
   )$
 
 repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.0.276'
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix, --show-fixes]
+
   - repo: https://github.com/ambv/black
-    rev: 22.3.0
+    rev: 23.3.0
     hooks:
       - id: black
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.5.0
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.4.1
     hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-bugbear
-
-  - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.10.1
-    hooks:
-      - id: isort
+      - id: mypy

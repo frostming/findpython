@@ -24,18 +24,24 @@ class Finder:
         resolve_symlinks: bool = False,
         no_same_file: bool = False,
         no_same_interpreter: bool = False,
+        selected_providers: list[str] | None = None,
     ) -> None:
         self.resolve_symlinks = resolve_symlinks
         self.no_same_file = no_same_file
         self.no_same_interpreter = no_same_interpreter
-        self._allowed_provider_names = set()
+        self._providers = self.setup_providers(selected_providers)
 
-        self._providers = self.setup_providers()
-
-    def setup_providers(self) -> list[BaseProvider]:
+    def setup_providers(
+        self,
+        selected_providers: list[str] | None = None,
+    ) -> list[BaseProvider]:
         providers: list[BaseProvider] = []
-        for provider_class in ALL_PROVIDERS:
-            self._allowed_provider_names.add(provider_class.name())
+        allowed_providers = {p.name(): p for p in ALL_PROVIDERS}
+        if selected_providers is not None:
+            allowed_providers = {
+                name: allowed_providers[name] for name in selected_providers
+            }
+        for provider_class in allowed_providers.values():
             provider = provider_class.create()
             if provider is None:
                 logger.debug("Provider %s is not available", provider_class.__name__)
@@ -47,7 +53,6 @@ class Finder:
         """Add provider to the provider list.
         If pos is given, it will be inserted at the given position.
         """
-        self._allowed_provider_names.add(provider.name())
         if pos is not None:
             self._providers.insert(pos, provider)
         else:
@@ -62,7 +67,6 @@ class Finder:
         dev: bool | None = None,
         name: str | None = None,
         architecture: str | None = None,
-        from_provider: list[str] | None = None,
     ) -> list[PythonVersion]:
         """
         Return all Python versions matching the given version criteria.
@@ -105,7 +109,7 @@ class Finder:
             architecture,
         )
         # Deduplicate with the python executable path
-        matched_python = set(self._find_all_python_versions(from_provider))
+        matched_python = set(self._find_all_python_versions())
         return self._dedup(matched_python, version_matcher)
 
     def find(
@@ -117,7 +121,6 @@ class Finder:
         dev: bool | None = None,
         name: str | None = None,
         architecture: str | None = None,
-        from_provider: list[str] | None = None,
     ) -> PythonVersion | None:
         """
         Return the Python version that is closest to the given version criteria.
@@ -133,34 +136,14 @@ class Finder:
         :return: a Python object or None
         """
         return next(
-            iter(self.find_all(major, minor, patch, pre, dev, name, architecture,
-                               from_provider)),
+            iter(self.find_all(major, minor, patch, pre, dev, name, architecture)),
             None,
         )
 
-    def _find_all_python_versions(
-        self,
-        from_provider: list[str] | None = None
-    ) -> Iterable[PythonVersion]:
+    def _find_all_python_versions(self) -> Iterable[PythonVersion]:
         """Find all python versions on the system."""
-        for provider in self._filtered_providers(from_provider):
+        for provider in self._providers:
             yield from provider.find_pythons()
-
-    def _filtered_providers(
-        self,
-        from_provider: list[str] | None = None
-    ) -> Iterable[BaseProvider]:
-        if from_provider is None:
-            yield from self._providers
-            return
-
-        provider_map = {provider.name(): provider for provider in self._providers}
-        for provider_name in from_provider:
-            try:
-                yield provider_map[provider_name]
-            except KeyError:
-                if provider_name not in self._allowed_provider_names:
-                    raise ValueError(f"No such provider {provider_name}")
 
     def _dedup(
         self,
@@ -176,7 +159,7 @@ class Finder:
                 return python_version.real_path.as_posix()
             return python_version.executable.as_posix()
 
-        def sort_key(python_version: PythonVersion) -> tuple[int, int]:
+        def sort_key(python_version: PythonVersion) -> tuple[int, int, int]:
             return (
                 python_version.executable.is_symlink(),
                 get_suffix_preference(python_version.name),

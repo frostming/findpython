@@ -14,6 +14,21 @@ logger = logging.getLogger("findpython")
 GET_VERSION_TIMEOUT = 5
 
 
+@lru_cache(maxsize=1024)
+def _run_script(executable: str, script: str, timeout: float | None = None) -> str:
+    """Run a script and return the output."""
+    command = [executable, "-EsSc", script]
+    logger.debug("Running script: %s", command)
+    return subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        timeout=timeout,
+        check=True,
+        text=True,
+    ).stdout
+
+
 @dc.dataclass
 class PythonVersion:
     """The single Python version object found by pythonfinder."""
@@ -161,7 +176,9 @@ class PythonVersion:
     def _get_version(self) -> Version:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
-        version = self._run_script(script, timeout=GET_VERSION_TIMEOUT).strip()
+        version = _run_script(
+            str(self.executable), script, timeout=GET_VERSION_TIMEOUT
+        ).strip()
         # Dev builds may produce version like `3.11.0+` and packaging.version
         # will reject it. Here we just remove the part after `+`
         # since it isn't critical for version comparison.
@@ -170,25 +187,11 @@ class PythonVersion:
 
     def _get_architecture(self) -> str:
         script = "import platform; print(platform.architecture()[0])"
-        return self._run_script(script).strip()
+        return _run_script(str(self.executable), script).strip()
 
     def _get_interpreter(self) -> str:
         script = "import sys; print(sys.executable)"
-        return self._run_script(script).strip()
-
-    @lru_cache(maxsize=1024)
-    def _run_script(self, script: str, timeout: float | None = None) -> str:
-        """Run a script and return the output."""
-        command = [self.executable.as_posix(), "-EsSc", script]
-        logger.debug("Running script: %s", command)
-        return subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            timeout=timeout,
-            check=True,
-            text=True,
-        ).stdout
+        return _run_script(str(self.executable), script).strip()
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""

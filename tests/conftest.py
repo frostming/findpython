@@ -9,7 +9,7 @@ from findpython.python import PythonVersion
 
 class _MockRegistry:
     def __init__(self) -> None:
-        self.versions = {}
+        self.versions: dict[Path, PythonVersion] = {}
 
     def add_python(
         self,

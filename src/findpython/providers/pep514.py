@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import platform
+import typing as t
 from pathlib import Path
-from typing import Iterable, Type
 
-from findpython.providers.base import BaseProvider, T
+from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 from findpython.utils import WINDOWS
 
@@ -15,12 +15,12 @@ class Pep514Provider(BaseProvider):
     """A provider that finds Python from the winreg."""
 
     @classmethod
-    def create(cls: Type[T]) -> T | None:
+    def create(cls) -> t.Self | None:
         if not WINDOWS:
             return None
         return cls()
 
-    def find_pythons(self) -> Iterable[PythonVersion]:
+    def find_pythons(self) -> t.Iterable[PythonVersion]:
         from findpython.pep514tools import findall as pep514_findall
 
         env_versions = pep514_findall()

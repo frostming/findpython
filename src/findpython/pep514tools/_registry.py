@@ -12,8 +12,8 @@ __all__ = [
     "REGISTRY_SOURCE_CU",
 ]
 
-from itertools import count
 import re
+from itertools import count
 
 try:
     import winreg
@@ -86,10 +86,8 @@ class PythonWrappedDict(object):
         key = self._attr_to_key(attr)
         try:
             return self._d[key]
-        except KeyError:
-            pass
         except Exception:
-            raise AttributeError(attr)
+            pass
         raise AttributeError(attr)
 
     def __setattr__(self, attr, value):

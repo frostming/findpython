@@ -1,7 +1,7 @@
 """
 This package contains all the providers for the pythonfinder module.
 """
-from typing import List, Type
+from __future__ import annotations
 
 from findpython.providers.asdf import AsdfProvider
 from findpython.providers.base import BaseProvider
@@ -10,7 +10,7 @@ from findpython.providers.path import PathProvider
 from findpython.providers.pep514 import Pep514Provider
 from findpython.providers.pyenv import PyenvProvider
 
-ALL_PROVIDERS: List[Type[BaseProvider]] = [
+ALL_PROVIDERS: list[type[BaseProvider]] = [
     # General:
     PathProvider,
     # Tool Specific:

@@ -2,20 +2,19 @@ from __future__ import annotations
 
 import abc
 import logging
+import typing as t
 from pathlib import Path
-from typing import Callable, Iterable, Type, TypeVar
 
 from findpython.python import PythonVersion
 from findpython.utils import path_is_python, safe_iter_dir
 
-T = TypeVar("T", bound="BaseProvider")
 logger = logging.getLogger("findpython")
 
 
 class BaseProvider(metaclass=abc.ABCMeta):
     """The base class for python providers"""
 
-    version_maker: Callable[..., PythonVersion] = PythonVersion
+    version_maker: t.Callable[..., PythonVersion] = PythonVersion
 
     @classmethod
     def name(cls) -> str:
@@ -25,24 +24,24 @@ class BaseProvider(metaclass=abc.ABCMeta):
         """
         self_name = cls.__name__.lower()
         if self_name.endswith("provider"):
-            self_name = self_name[:-len("provider")]
+            self_name = self_name[: -len("provider")]
         return self_name
 
     @classmethod
     @abc.abstractmethod
-    def create(cls: Type[T]) -> T | None:
+    def create(cls) -> t.Self | None:
         """Return an instance of the provider or None if it is not available"""
         pass
 
     @abc.abstractmethod
-    def find_pythons(self) -> Iterable[PythonVersion]:
+    def find_pythons(self) -> t.Iterable[PythonVersion]:
         """Return the python versions found by the provider"""
         pass
 
     @classmethod
     def find_pythons_from_path(
         cls, path: Path, as_interpreter: bool = False
-    ) -> Iterable[PythonVersion]:
+    ) -> t.Iterable[PythonVersion]:
         """A general helper method to return pythons under a given path.
 
         :param path: The path to search for pythons
