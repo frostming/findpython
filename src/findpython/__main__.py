@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import sys
 from argparse import ArgumentParser
-from typing import List
 
 from findpython import Finder
 from findpython.__version__ import __version__
@@ -21,7 +20,11 @@ def setup_logger(level: int = logging.DEBUG) -> None:
     logger.setLevel(level)
 
 
-def cli(argv: List[str] | None = None) -> int:
+def split_str(value: str) -> list[str]:
+    return value.split(",")
+
+
+def cli(argv: list[str] | None = None) -> int:
     """
     Command line interface for findpython.
     """
@@ -46,23 +49,24 @@ def cli(argv: List[str] | None = None) -> int:
         action="store_true",
         help="Eliminate the duplicated results with the same sys.executable",
     )
-    parser.add_argument(
-        "--provider",
-        nargs="+",
-        help="Select provider(s) to use",
-    )
+    parser.add_argument("--provider", type=split_str, help="Select provider(s) to use")
     parser.add_argument("version_spec", nargs="?", help="Python version spec or name")
 
     args = parser.parse_args(argv)
     if args.verbose:
         setup_logger()
-    finder = Finder(resolve_symlinks=args.resolve_symlink, no_same_file=args.no_same_file)
+
+    finder = Finder(
+        resolve_symlinks=args.resolve_symlink,
+        no_same_file=args.no_same_file,
+        selected_providers=args.provider,
+    )
     if args.all:
         find_func = finder.find_all
     else:
-        find_func = finder.find
+        find_func = finder.find  # type: ignore[assignment]
 
-    python_versions = find_func(args.version_spec, from_provider=args.provider)
+    python_versions = find_func(args.version_spec)
     if not python_versions:
         print("No matching python version found", file=sys.stderr)
         return 1

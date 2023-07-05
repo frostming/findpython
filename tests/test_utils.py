@@ -1,6 +1,6 @@
-from findpython.utils import WINDOWS, looks_like_python
 import pytest
 
+from findpython.utils import WINDOWS, looks_like_python
 
 matrix = [
     ("python", True),

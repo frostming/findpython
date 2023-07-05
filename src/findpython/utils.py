@@ -7,7 +7,10 @@ import re
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import Generator
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from typing import Generator, Sequence, TypedDict
 
 VERSION_RE = re.compile(
     r"(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?"
@@ -30,7 +33,7 @@ PYTHON_IMPLEMENTATIONS = (
     "micropython",
 )
 if WINDOWS:
-    KNOWN_EXTS = (".exe", "", ".py", ".bat")
+    KNOWN_EXTS: Sequence[str] = (".exe", "", ".py", ".bat")
 else:
     KNOWN_EXTS = ("", ".sh", ".bash", ".csh", ".zsh", ".fish", ".py")
 PY_MATCH_STR = (
@@ -117,7 +120,18 @@ def get_binary_hash(path: Path) -> str:
     return hasher.hexdigest()
 
 
-def parse_major(version: str) -> dict[str, int | bool | None] | None:
+if TYPE_CHECKING:
+
+    class VersionDict(TypedDict):
+        pre: bool | None
+        dev: bool | None
+        major: int | None
+        minor: int | None
+        patch: int | None
+        architecture: str | None
+
+
+def parse_major(version: str) -> VersionDict | None:
     """Parse the version dict from the version string"""
     match = VERSION_RE.match(version)
     if not match:
@@ -130,7 +144,7 @@ def parse_major(version: str) -> dict[str, int | bool | None] | None:
             rv[int_values] = int(rv[int_values])
     if rv["architecture"]:
         rv["architecture"] = f"{rv['architecture']}bit"
-    return rv
+    return cast("VersionDict", rv)
 
 
 def get_suffix_preference(name: str) -> int:

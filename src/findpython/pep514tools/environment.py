@@ -7,13 +7,14 @@
 
 __all__ = ["Environment", "findall", "find", "findone"]
 
+import sys
+
 from findpython.pep514tools._registry import (
-    open_source,
+    REGISTRY_SOURCE_CU,
     REGISTRY_SOURCE_LM,
     REGISTRY_SOURCE_LM_WOW6432,
-    REGISTRY_SOURCE_CU,
+    open_source,
 )
-import sys
 
 # These tags are treated specially when the Company is 'PythonCore'
 _PYTHONCORE_COMPATIBILITY_TAGS = {

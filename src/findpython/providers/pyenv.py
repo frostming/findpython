@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from pathlib import Path
-from typing import Iterable, Type
 
-from findpython.providers.base import BaseProvider, T
+from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 
 
@@ -15,7 +15,7 @@ class PyenvProvider(BaseProvider):
         self.root = root
 
     @classmethod
-    def create(cls: Type[T]) -> T | None:
+    def create(cls) -> t.Self | None:
         pyenv_root = os.path.expanduser(
             os.path.expandvars(os.getenv("PYENV_ROOT", "~/.pyenv"))
         )
@@ -23,7 +23,7 @@ class PyenvProvider(BaseProvider):
             return None
         return cls(Path(pyenv_root))
 
-    def find_pythons(self) -> Iterable[PythonVersion]:
+    def find_pythons(self) -> t.Iterable[PythonVersion]:
         versions_path = self.root.joinpath("versions")
         if versions_path.exists():
             for version in versions_path.iterdir():

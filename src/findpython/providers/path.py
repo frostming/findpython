@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Type
 
-from findpython.providers.base import BaseProvider, T
+from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 
 
@@ -16,10 +16,10 @@ class PathProvider(BaseProvider):
     paths: list[Path]
 
     @classmethod
-    def create(cls: Type[T]) -> T | None:
+    def create(cls) -> t.Self | None:
         paths = [Path(path) for path in os.getenv("PATH", "").split(os.pathsep) if path]
         return cls(paths)
 
-    def find_pythons(self) -> Iterable[PythonVersion]:
+    def find_pythons(self) -> t.Iterable[PythonVersion]:
         for path in self.paths:
             yield from self.find_pythons_from_path(path)

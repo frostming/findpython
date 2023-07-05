@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from pathlib import Path
-from typing import Iterable, Type
 
-from findpython.providers.base import BaseProvider, T
+from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 
 
@@ -15,7 +15,7 @@ class AsdfProvider(BaseProvider):
         self.root = root
 
     @classmethod
-    def create(cls: Type[T]) -> T | None:
+    def create(cls) -> t.Self | None:
         asdf_root = os.path.expanduser(
             os.path.expandvars(os.getenv("ASDF_DATA_DIR", "~/.asdf"))
         )
@@ -23,7 +23,7 @@ class AsdfProvider(BaseProvider):
             return None
         return cls(Path(asdf_root))
 
-    def find_pythons(self) -> Iterable[PythonVersion]:
+    def find_pythons(self) -> t.Iterable[PythonVersion]:
         python_dir = self.root / "installs/python"
         if not python_dir.exists():
             return

@@ -61,17 +61,17 @@ def test_find_python_from_provider(mocked_python, tmp_path, monkeypatch):
     monkeypatch.setenv("ASDF_DATA_DIR", str(tmp_path / ".asdf"))
     monkeypatch.setenv("PYENV_ROOT", str(tmp_path / ".pyenv"))
 
-    pythons = Finder().find_all(3, 8, from_provider=["pyenv", "asdf"])
+    pythons = Finder(selected_providers=["pyenv", "asdf"]).find_all(3, 8)
     assert len(pythons) == 3
     assert python38 in pythons
     assert python381 in pythons
     assert python382 in pythons
 
-    asdf_pythons = Finder().find_all(3, 8, from_provider=["asdf"])
+    asdf_pythons = Finder(selected_providers=["asdf"]).find_all(3, 8)
     assert len(asdf_pythons) == 2
     assert python38 in asdf_pythons
     assert python382 in asdf_pythons
 
-    pyenv_pythons = Finder().find_all(3, 8, from_provider=["pyenv"])
+    pyenv_pythons = Finder(selected_providers=["pyenv"]).find_all(3, 8)
     assert len(pyenv_pythons) == 1
     assert python381 in pyenv_pythons
