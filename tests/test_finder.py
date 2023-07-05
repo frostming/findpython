@@ -4,8 +4,7 @@ from pathlib import Path
 import pytest
 from packaging.version import Version
 
-from findpython import Finder
-from findpython.providers import ALL_PROVIDERS
+from findpython import Finder, register_provider
 from findpython.providers.pyenv import PyenvProvider
 
 
@@ -117,7 +116,7 @@ def test_find_python_deduplicate_same_interpreter(mocked_python, tmp_path, switc
 
 
 def test_find_python_from_pyenv(mocked_python, tmp_path, monkeypatch):
-    ALL_PROVIDERS.append(PyenvProvider)
+    register_provider(PyenvProvider)
     python = mocked_python.add_python(
         tmp_path / ".pyenv/versions/3.8/bin/python", "3.8.0"
     )
@@ -128,7 +127,7 @@ def test_find_python_from_pyenv(mocked_python, tmp_path, monkeypatch):
 
 
 def test_find_python_skips_empty_pyenv(mocked_python, tmp_path, monkeypatch):
-    ALL_PROVIDERS.append(PyenvProvider)
+    register_provider(PyenvProvider)
     pyenv_path = Path(tmp_path / ".pyenv")
     pyenv_path.mkdir()
     monkeypatch.setenv("PYENV_ROOT", str(pyenv_path))

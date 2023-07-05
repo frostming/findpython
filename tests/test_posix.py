@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from findpython import register_provider
 from findpython.finder import Finder
-from findpython.providers import ALL_PROVIDERS
 from findpython.providers.asdf import AsdfProvider
 from findpython.providers.pyenv import PyenvProvider
 
@@ -24,7 +24,7 @@ def test_find_python_resolve_symlinks(mocked_python, tmp_path, switch):
 
 
 def test_find_python_from_asdf(mocked_python, tmp_path, monkeypatch):
-    ALL_PROVIDERS.append(AsdfProvider)
+    register_provider(AsdfProvider)
     python = mocked_python.add_python(
         tmp_path / ".asdf/installs/python/3.8/bin/python", "3.8.0"
     )
@@ -47,8 +47,8 @@ def test_find_python_exclude_unreadable(mocked_python, tmp_path):
 
 
 def test_find_python_from_provider(mocked_python, tmp_path, monkeypatch):
-    ALL_PROVIDERS.append(AsdfProvider)
-    ALL_PROVIDERS.append(PyenvProvider)
+    register_provider(AsdfProvider)
+    register_provider(PyenvProvider)
     python38 = mocked_python.add_python(
         tmp_path / ".asdf/installs/python/3.8/bin/python", "3.8.0"
     )

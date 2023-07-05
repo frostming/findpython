@@ -51,7 +51,8 @@ def mocked_python(tmp_path, monkeypatch):
     monkeypatch.setattr(
         "findpython.providers.base.BaseProvider.version_maker", mocked.version_maker
     )
-    ALL_PROVIDERS[:] = [PathProvider]
+    ALL_PROVIDERS.clear()
+    ALL_PROVIDERS["path"] = PathProvider
     monkeypatch.setenv("PATH", str(tmp_path))
     return mocked
 

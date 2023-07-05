@@ -5,7 +5,11 @@
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, TypeVar
+
 from findpython.finder import Finder
+from findpython.providers import ALL_PROVIDERS
+from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 
 
@@ -41,4 +45,18 @@ def find_all(*args, **kwargs) -> list[PythonVersion]:
     return Finder().find_all(*args, **kwargs)
 
 
-__all__ = ["Finder", "find", "find_all", "PythonVersion"]
+if TYPE_CHECKING:
+    P = TypeVar("P", bound=type[BaseProvider])
+
+
+def register_provider(provider: P) -> P:
+    """
+    Register a provider to use when finding python versions.
+
+    :param provider: A provider class
+    """
+    ALL_PROVIDERS[provider.name()] = provider
+    return provider
+
+
+__all__ = ["Finder", "find", "find_all", "PythonVersion", "register_provider"]

@@ -36,11 +36,9 @@ class Finder:
         selected_providers: list[str] | None = None,
     ) -> list[BaseProvider]:
         providers: list[BaseProvider] = []
-        allowed_providers = {p.name(): p for p in ALL_PROVIDERS}
+        allowed_providers = ALL_PROVIDERS
         if selected_providers is not None:
-            allowed_providers = {
-                name: allowed_providers[name] for name in selected_providers
-            }
+            allowed_providers = {name: ALL_PROVIDERS[name] for name in selected_providers}
         for provider_class in allowed_providers.values():
             provider = provider_class.create()
             if provider is None:
