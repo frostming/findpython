@@ -1,5 +1,6 @@
-use lazy_static::__Deref;
-use std::cell::{Ref, RefCell, RefMut};
+use serde::ser::SerializeStruct;
+use std::cell::RefCell;
+use std::fmt;
 use std::process::Stdio;
 use std::time::Duration;
 use std::{fs, hash::Hash, io, path::PathBuf, str::FromStr};
@@ -125,7 +126,7 @@ impl PythonVersion {
     }
 
     pub fn real_path(&self) -> PathBuf {
-        resolve_symlink(&self.executable).unwrap_or_else(|e| self.executable.clone())
+        resolve_symlink(&self.executable).unwrap_or_else(|_| self.executable.clone())
     }
 
     pub fn is_valid(&mut self) -> bool {
@@ -157,6 +158,7 @@ impl PythonVersion {
     fn _get_architecture(&self) -> Result<String, io::Error> {
         let script = "import platform; print(platform.architecture()[0])";
         run_python_script(&self.executable.to_string_lossy(), script, None)
+            .map(|v| v.trim().to_string())
     }
 
     pub fn version(&self) -> Result<Version, io::Error> {
@@ -223,9 +225,41 @@ impl PythonVersion {
     }
 }
 
+impl fmt::Display for PythonVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} {} @ {}",
+            self.executable.file_name().unwrap().to_string_lossy(),
+            self.version()
+                .map_or("INVALID".to_string(), |v| v.to_string()),
+            self.executable.to_string_lossy()
+        )
+    }
+}
+
 impl Hash for PythonVersion {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.executable.hash(state);
+    }
+}
+
+impl serde::Serialize for PythonVersion {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut s = serializer.serialize_struct("PythonVersion", 4)?;
+        s.serialize_field("executable", &self.executable)?;
+        s.serialize_field(
+            "version",
+            &self
+                .version()
+                .map_or("INVALID".to_string(), |v| v.to_string()),
+        )?;
+        s.serialize_field("architecture", &self.architecture().unwrap_or_default())?;
+        s.serialize_field("interpreter", &self.interpreter().unwrap_or_default())?;
+        s.end()
     }
 }
 

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, io};
 
 use crate::{helpers::suffix_preference, providers::*, PythonVersion};
 use fancy_regex::Regex;
@@ -7,9 +7,9 @@ use lazy_static::lazy_static;
 lazy_static! {
     static ref VERSION_REGEX: Regex = Regex::new(
         r#"(?x)
-        (?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?
+        ^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?
         (?:(?P<prerel>[abc]|rc|dev)(?:(?P<prerelversion>\d+(?:\.\d+)*))?)
-        ?(?P<postdev>(\.post(?P<post>\d+))?(\.dev(?P<dev>\d+))?)?"
+        ?(?P<postdev>(\.post(?P<post>\d+))?(\.dev(?P<dev>\d+))?)?
         (?:-(?P<architecture>32|64))?"#
     )
     .unwrap();
@@ -37,15 +37,16 @@ impl Default for Finder {
 }
 
 impl Finder {
-    pub fn select_providers(mut self, names: &[&str]) -> Self {
-        self.providers = self
-            .providers
-            .into_iter()
-            .filter(|p| names.contains(&p.name()))
-            .collect();
-        self.providers
-            .sort_by_key(|p| names.iter().position(|n| *n == p.name()).unwrap());
-        self
+    pub fn select_providers(mut self, names: &[&str]) -> Result<Self, io::Error> {
+        self.providers = names
+            .iter()
+            .map(|n| {
+                get_provider(*n).ok_or_else(|| {
+                    io::Error::new(io::ErrorKind::NotFound, format!("Provider {} not found", n))
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(self)
     }
 
     pub fn resolve_symlinks(mut self, resolve_symlinks: bool) -> Self {

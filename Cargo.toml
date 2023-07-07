@@ -2,19 +2,19 @@
 name = "findpython"
 version = "23.7.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[lib]
-name = "findpython"
-crate-type = ["cdylib"]
+description = "Find python executables on your system"
 
 [dependencies]
+anyhow = "1.0.71"
+clap = { version = "4.3.11", features = ["derive"] }
 dirs = "5.0.1"
 fancy-regex = "0.11.0"
 lazy_static = "1.4.0"
 md5 = "0.7.0"
 pep440_rs = "0.3.11"
 pyo3 = { version = "0.19.0", optional = true }
+serde = { version = "1.0.167", features = ["derive"] }
+serde_json = "1.0.100"
 shellexpand = "3.1.0"
 wait-timeout = "0.2.0"
 which = "4.4.0"
