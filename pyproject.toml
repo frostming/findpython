@@ -1,84 +1,22 @@
+[build-system]
+requires = ["maturin>=1.1,<2.0"]
+build-backend = "maturin"
+
 [project]
 name = "findpython"
 description = "A utility to find python versions on your system"
 authors = [
     {name = "Frost Ming", email = "mianghong@gmail.com"},
 ]
-dependencies = [
-    "packaging>=20",
-]
+dependencies = []
 requires-python = ">=3.7"
 license = {text = "MIT"}
 readme = "README.md"
-dynamic = ["version"]
 
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
 ]
 
-[project.urls]
-Homepage = "https://github.com/frostming/findpython"
-
-[project.scripts]
-findpython = "findpython.__main__:main"
-
-[tool.pdm.version]
-source = "scm"
-write_to = "findpython/__version__.py"
-write_template = "__version__ = \"{}\"\n"
-
-[tool.pdm.build]
-package-dir = "src"
-
-[tool.pdm.dev-dependencies]
-tests = ["pytest"]
-
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-[tool.black]
-line-length = 90
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-  | src/pythonfinder/_vendor
-)
-'''
-
-[tool.ruff]
-line-length = 90
-select = [
-  "B",    # flake8-bugbear
-  "C4",   # flake8-comprehensions
-  "E",    # pycodestyle
-  "F",    # pyflakes
-  "PGH",  # pygrep-hooks
-  "RUF",  # ruff
-  "W",    # pycodestyle
-  "YTT",  # flake8-2020
-]
-extend-ignore = ["B018", "B019"]
-src = ["src"]
-exclude = ["tests/fixtures"]
-target-version = "py37"
-
-[tool.ruff.mccabe]
-max-complexity = 10
-
-[tool.ruff.isort]
-known-first-party = ["findpython"]
-
-
+[tool.maturin]
+features = ["pyo3/extension-module"]
