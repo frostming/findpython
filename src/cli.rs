@@ -66,8 +66,9 @@ pub fn main() -> anyhow::Result<()> {
     };
 
     if paths.len() == 0 {
-        return Err(anyhow!("No Python versions found"));
+        return Err(anyhow!("No matching Python versions found"));
     }
+    eprintln!("Found matching Python versions:");
     match cli.output.as_str() {
         "default" => {
             for path in paths {
