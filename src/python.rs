@@ -1,13 +1,15 @@
 use serde::ser::SerializeStruct;
 use std::cell::RefCell;
-use std::collections::hash_map::DefaultHasher;
 use std::fmt;
-use std::hash::Hasher;
 use std::process::Stdio;
 use std::time::Duration;
 use std::{hash::Hash, io, path::PathBuf, str::FromStr};
 use wait_timeout::ChildExt;
 
+#[cfg(feature = "pyo3")]
+use std::collections::hash_map::DefaultHasher;
+#[cfg(feature = "pyo3")]
+use std::hash::Hasher;
 #[cfg(feature = "pyo3")]
 use pep440_rs::PyVersion;
 use pep440_rs::Version;

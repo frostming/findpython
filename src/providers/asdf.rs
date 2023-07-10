@@ -4,19 +4,19 @@ use std::path::PathBuf;
 use super::Provider;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct PyenvProvider {
+pub(super) struct AsdfProvider {
     root: PathBuf,
 }
 
-impl PyenvProvider {
+impl AsdfProvider {
     pub fn new(root: PathBuf) -> Self {
         Self { root }
     }
 }
 
-impl Provider for PyenvProvider {
+impl Provider for AsdfProvider {
     fn create() -> Option<Self> {
-        let pyenv_root = std::env::var_os("PYENV_ROOT").unwrap_or("$HOME/.pyenv".into());
+        let pyenv_root = std::env::var_os("ASDF_DATA_DIR").unwrap_or("$HOME/.asdf".into());
 
         let root =
             shellexpand::env_with_context_no_errors(pyenv_root.to_str().unwrap(), |var_name| {
@@ -36,20 +36,20 @@ impl Provider for PyenvProvider {
     }
 
     fn find_pythons(&self) -> Vec<crate::python::PythonVersion> {
-        let versions_path = self.root.join("versions");
+        let versions_path = self.root.join("installs/python");
         match versions_path.read_dir() {
             Ok(entries) => entries
                 .into_iter()
                 .flat_map(|entry| match entry {
-                    Ok(entry) => {
-                        let path = entry.path();
+                    Ok(entry) if entry.path().is_dir() => {
+                        let path = entry.path().join("bin");
                         if path.is_dir() {
-                            self.find_pythons_from_path(&path.join("bin"), true)
+                            self.find_pythons_from_path(&path, true)
                         } else {
                             vec![]
                         }
                     }
-                    Err(_) => vec![],
+                    _ => vec![],
                 })
                 .collect(),
             Err(_) => vec![],

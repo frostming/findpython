@@ -17,10 +17,24 @@ It simplifies the whole code structure while preserving most of the original fea
 
 ## Installation
 
-FindPython is installable via any kind of package manager including `pip`:
+FindPython can be used in both Python and Rust projects.
+
+To install FindPython in Python:
 
 ```bash
 pip install findpython
+```
+
+To install FindPython in Rust:
+
+```bash
+cargo install findpyhton
+```
+
+Or use FindPython library in a Rust project:
+
+```bash
+cargo add findpython
 ```
 
 <details>
@@ -31,7 +45,7 @@ pip install findpython
 </a>
 </details>
 
-## Usage
+## Python Usage
 
 ```python
 >>> import findpython
@@ -49,26 +63,44 @@ pip install findpython
 [<PythonVersion executable=PosixPath('/opt/homebrew/bin/python3.9'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/opt/homebrew/bin/python3'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/Users/fming/Library/PythonUp/cmd/python3.9'), version=<Version('3.9.9')>, architecture='64bit', major=3, minor=9, patch=9>, <PythonVersion executable=PosixPath('/usr/local/bin/python3.9'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>, <PythonVersion executable=PosixPath('/usr/local/bin/python3'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>]
 ```
 
+## Rust Usage
+
+```rust
+use findpython::Finder;
+
+fn main() {
+    let finder = Finder::default();
+
+    // Find by major and minor version
+    let py = finder.find(3, 9).unwrap();
+    println!("{:?}", py);
+    // Find all matches
+    let all_pythons = finder.find_all();
+    println!("{:?}", all_pythons);
+}
+```
+
 ## CLI Usage
 
 In addition, FindPython provides a CLI interface to find python versions:
 
 ```
-usage: findpython [-h] [-V] [-a] [--resolve-symlink] [-v] [--no-same-file] [--no-same-python] [version_spec]
+Find python executables on your system
 
-Find python files in a directory
+Usage: findpython [OPTIONS] [VERSION_SPEC]
 
-positional arguments:
-  version_spec       Python version spec or name
+Arguments:
+  [VERSION_SPEC]  The version spec to find, e.g. 3|3.8|python3
 
-options:
-  -h, --help         show this help message and exit
-  -V, --version      show program's version number and exit
-  -a, --all          Show all matching python versions
-  --resolve-symlink  Resolve all symlinks
-  -v, --verbose      Verbose output
-  --no-same-file     Eliminate the duplicated results with the same file contents
-  --no-same-python   Eliminate the duplicated results with the same sys.executable
+Options:
+  -a, --all                    Return all matching Python versions
+      --resolve-symlinks       Resolve symlinks and remove duplicate results
+      --no-same-file           Remove duplicate results that are the same binary
+      --no-same-python         Remove duplicate results that wrap the same Python interpreter
+      --providers <PROVIDERS>  Select provider names(comma-separated) to use
+  -o, --output <OUTPUT>        The output format [default: default] [possible values: default, json, path]
+  -h, --help                   Print help
+  -V, --version                Print version
 ```
 
 ## Integration
@@ -80,6 +112,10 @@ FindPython finds Python from the following places:
 -   asdf
 -   `/Library/Frameworks/Python.framework/Versions` (MacOS)
 -   winreg (Windows)
+-   [Rye] project manager backed by [python-build-standalone]
+
+[rye]: https://rye-up.com
+[python-build-standalone]: https://github.com/indygreg/python-build-standalone
 
 ## License
 

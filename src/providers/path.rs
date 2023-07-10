@@ -5,7 +5,7 @@ use crate::PythonVersion;
 
 /// A provider that searches Python interpreters in the PATH.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PathProvider {
+pub(super) struct PathProvider {
     paths: Vec<PathBuf>,
 }
 

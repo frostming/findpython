@@ -6,12 +6,11 @@ use lazy_static::lazy_static;
 
 mod path;
 mod pyenv;
-
-pub use path::PathProvider;
-pub use pyenv::PyenvProvider;
+mod rye;
+mod asdf;
 
 lazy_static! {
-    pub static ref ALL_PROVIDERS: [&'static str; 2] = ["path", "pyenv"];
+    pub static ref ALL_PROVIDERS: [&'static str; 3] = ["path", "pyenv", "rye"];
 }
 
 pub trait Provider: Send + Sync {
@@ -54,8 +53,10 @@ pub trait Provider: Send + Sync {
 
 pub fn get_provider(name: &str) -> Option<Box<dyn Provider>> {
     match name {
-        "path" => PathProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
-        "pyenv" => PyenvProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
+        "path" => path::PathProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
+        "pyenv" => pyenv::PyenvProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
+        "rye" => rye::RyeProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
+        "asdf" => asdf::AsdfProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
         _ => None,
     }
 }
