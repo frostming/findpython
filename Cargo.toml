@@ -4,7 +4,7 @@ crate-type = ["cdylib", "rlib"]
 
 [package]
 name = "findpython"
-version = "23.7.0"
+version = "1.0.0-alpha.0"
 edition = "2021"
 description = "Find python executables on your system"
 
