@@ -4,6 +4,9 @@ use crate::{helpers::suffix_preference, providers::*, PythonVersion};
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
 
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
 lazy_static! {
     static ref VERSION_REGEX: Regex = Regex::new(
         r#"(?x)
@@ -15,6 +18,7 @@ lazy_static! {
     .unwrap();
 }
 
+#[cfg_attr(feature = "pyo3", pyclass)]
 pub struct Finder {
     providers: Vec<Box<dyn Provider>>,
     resolve_symlinks: bool,
@@ -22,17 +26,20 @@ pub struct Finder {
     same_interpreter: bool,
 }
 
-impl Default for Finder {
-    fn default() -> Self {
+impl Finder {
+    pub fn new() -> Self {
         Self {
-            providers: ALL_PROVIDERS
-                .iter()
-                .filter_map(|name| get_provider(*name))
-                .collect(),
+            providers: vec![],
             resolve_symlinks: false,
             same_file: true,
             same_interpreter: true,
         }
+    }
+}
+
+impl Default for Finder {
+    fn default() -> Self {
+        Self::new().select_providers(&ALL_PROVIDERS[..]).unwrap()
     }
 }
 
@@ -81,7 +88,7 @@ impl Finder {
 
         let pythons = self.find_all_python_versions();
         let mut filtered = vec![];
-        for mut python in pythons {
+        for python in pythons {
             if python.matches(&options) {
                 filtered.push(python);
             }
@@ -131,6 +138,136 @@ impl Finder {
     }
 }
 
+#[cfg(feature = "pyo3")]
+#[derive(FromPyObject)]
+enum StringInt {
+    STRING(String),
+    INT(usize),
+}
+
+#[cfg(feature = "pyo3")]
+#[pymethods]
+impl Finder {
+    #[new]
+    #[pyo3(signature = (resolve_symlinks = false, no_same_file = false, no_same_interpreter = false, selected_providers = None))]
+    fn py_new(
+        resolve_symlinks: bool,
+        no_same_file: bool,
+        no_same_interpreter: bool,
+        selected_providers: Option<Vec<String>>,
+    ) -> Result<Self, io::Error> {
+        let mut f = Self {
+            providers: vec![],
+            resolve_symlinks,
+            same_file: !no_same_file,
+            same_interpreter: !no_same_interpreter,
+        };
+        if let Some(names) = selected_providers {
+            let names: Vec<&str> = names.iter().map(|v| v.as_str()).collect();
+            f = f.select_providers(names.as_slice())?
+        }
+        Ok(f)
+    }
+
+    #[getter]
+    fn get_resolve_symlinks(&self) -> bool {
+        self.resolve_symlinks
+    }
+
+    #[setter]
+    fn set_resolve_symlinks(&mut self, resolve_symlinks: bool) {
+        self.resolve_symlinks = resolve_symlinks
+    }
+
+    #[getter]
+    fn get_same_file(&self) -> bool {
+        self.same_file
+    }
+
+    #[setter]
+    fn set_same_file(&mut self, same_file: bool) {
+        self.same_file = same_file
+    }
+
+    #[getter]
+    fn get_same_interpreter(&self) -> bool {
+        self.same_interpreter
+    }
+
+    #[setter]
+    fn set_same_interpreter(&mut self, same_interpreter: bool) {
+        self.same_interpreter = same_interpreter
+    }
+
+    #[pyo3(name = "find_all")]
+    fn py_find_all(
+        &self,
+        major: Option<StringInt>,
+        minor: Option<usize>,
+        patch: Option<usize>,
+        pre: Option<bool>,
+        dev: Option<bool>,
+        name: Option<String>,
+        architecture: Option<String>,
+    ) -> Vec<PythonVersion> {
+        let text = if let Some(StringInt::STRING(s)) = &major {
+            Some(s.as_str())
+        } else {
+            None
+        };
+        self.find_all(
+            text,
+            MatchOptions {
+                major: if let Some(StringInt::INT(i)) = major {
+                    Some(i)
+                } else {
+                    None
+                },
+                minor,
+                patch,
+                pre,
+                dev,
+                name,
+                architecture,
+            },
+        )
+    }
+
+    #[pyo3(name = "find")]
+    fn py_find(
+        &self,
+        major: Option<StringInt>,
+        minor: Option<usize>,
+        patch: Option<usize>,
+        pre: Option<bool>,
+        dev: Option<bool>,
+        name: Option<String>,
+        architecture: Option<String>,
+    ) -> Option<PythonVersion> {
+        let text = if let Some(StringInt::STRING(s)) = &major {
+            Some(s.as_str())
+        } else {
+            None
+        };
+        self.find(
+            text,
+            MatchOptions {
+                major: if let Some(StringInt::INT(i)) = major {
+                    Some(i)
+                } else {
+                    None
+                },
+                minor,
+                patch,
+                pre,
+                dev,
+                name,
+                architecture,
+            },
+        )
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct MatchOptions {
     pub major: Option<usize>,
@@ -170,5 +307,18 @@ impl MatchOptions {
             name: other.name.or(self.name),
             architecture: other.architecture.or(self.architecture),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_find_pythons() {
+        let finder = Finder::default();
+
+        let pythons = finder.find_all(None, MatchOptions::default());
+        assert!(pythons.len() > 0);
     }
 }

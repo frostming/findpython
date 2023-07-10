@@ -19,10 +19,6 @@ impl PathProvider {
 }
 
 impl Provider for PathProvider {
-    fn name(&self) -> &'static str {
-        "path"
-    }
-
     fn create() -> Option<Self> {
         Some(Self::new())
     }

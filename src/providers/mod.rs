@@ -14,9 +14,7 @@ lazy_static! {
     pub static ref ALL_PROVIDERS: [&'static str; 2] = ["path", "pyenv"];
 }
 
-pub trait Provider {
-    fn name(&self) -> &'static str;
-
+pub trait Provider: Send + Sync {
     fn create() -> Option<Self>
     where
         Self: Sized;

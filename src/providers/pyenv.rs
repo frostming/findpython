@@ -15,10 +15,6 @@ impl PyenvProvider {
 }
 
 impl Provider for PyenvProvider {
-    fn name(&self) -> &'static str {
-        "pyenv"
-    }
-
     fn create() -> Option<Self> {
         let pyenv_root = std::env::var_os("PYENV_ROOT").unwrap_or("$HOME/.pyenv".into());
 
