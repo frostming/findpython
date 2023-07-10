@@ -1,7 +1,7 @@
-from _typeshed import StrPath
 from pathlib import Path
 from typing import Sequence
 
+from _typeshed import StrPath
 from pep440_rs import Version
 
 class PythonVersion:
