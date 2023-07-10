@@ -74,23 +74,21 @@ jobs:
 
   macos:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [x86_64, universal2-apple-darwin]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           architecture: x64
-      - name: Build wheels - x86_64
+      - name: Build wheels - ${{ matrix.target }}
         uses: PyO3/maturin-action@v1
         with:
-          target: x86_64
+          target: ${{ matrix.target }}
           args: --release --strip --out dist --sdist
-        env:
-          RUSTFLAGS: "-C link-arg=-undefined -C link-arg=dynamic_lookup"
-      - name: Build wheels - universal2
-        uses: PyO3/maturin-action@v1
-        with:
-          args: --release --strip --out dist --target universal2-apple-darwin
+          sccache: 'true'
         env:
           RUSTFLAGS: "-C link-arg=-undefined -C link-arg=dynamic_lookup"
       - name: Upload wheels
