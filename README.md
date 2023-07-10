@@ -50,29 +50,30 @@ cargo add findpython
 ```python
 >>> import findpython
 >>> findpython.find(3, 9)  # Find by major and minor version
-<PythonVersion executable=PosixPath('/opt/homebrew/bin/python3.9'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>
+<PythonVersion executable=/opt/homebrew/bin/python3.9, version=3.9.17, arch=64bit>
 >>> findpython.find("3.9")  # Find by version string
-<PythonVersion executable=PosixPath('/opt/homebrew/bin/python3.9'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>
+<PythonVersion executable=/opt/homebrew/bin/python3.9, version=3.9.17, arch=64bit>
 >>> findpython.find("3.9-32")  # Find by version string and architecture
-<PythonVersion executable=WindowsPath('C:\\Python\\3.9-32\\python.exe'), version=<Version('3.9.10')>, architecture='32bit', major=3, minor=9, patch=10>
+<PythonVersion executable=C:/Python/3.9-32/python.exe, version=3.9.10, arch=32bit>
 >>> findpython.find(name="python3")  # Find by executable name
-<PythonVersion executable=PosixPath('/Users/fming/Library/PythonUp/bin/python3'), version=<Version('3.10.2')>, architecture='64bit', major=3, minor=10, patch=2>
+<PythonVersion executable=/Users/fming/wkspace/github/findpython/.venv/bin/python3, version=3.11.4, arch=64bit>
 >>> findpython.find("python3")  # Find by executable name without keyword argument, same as above
-<PythonVersion executable=PosixPath('/Users/fming/Library/PythonUp/bin/python3'), version=<Version('3.10.2')>, architecture='64bit', major=3, minor=10, patch=2>
+<PythonVersion executable=/Users/fming/wkspace/github/findpython/.venv/bin/python3, version=3.11.4, arch=64bit>
 >>> findpython.find_all(major=3, minor=9)  # Same arguments as `find()`, but return all matches
-[<PythonVersion executable=PosixPath('/opt/homebrew/bin/python3.9'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/opt/homebrew/bin/python3'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/Users/fming/Library/PythonUp/cmd/python3.9'), version=<Version('3.9.9')>, architecture='64bit', major=3, minor=9, patch=9>, <PythonVersion executable=PosixPath('/usr/local/bin/python3.9'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>, <PythonVersion executable=PosixPath('/usr/local/bin/python3'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>]
+[<PythonVersion executable=/opt/homebrew/bin/python3.9, version=3.9.17, arch=64bit>,
+ <PythonVersion executable=/usr/bin/python3, version=3.9.6, arch=64bit>]
 ```
 
 ## Rust Usage
 
 ```rust
-use findpython::Finder;
+use findpython::{Finder, MatchOptions};
 
 fn main() {
     let finder = Finder::default();
 
     // Find by major and minor version
-    let py = finder.find(3, 9).unwrap();
+    let py = finder.find(MatchOptions::default().major(3).minor(10)).unwrap();
     println!("{:?}", py);
     // Find all matches
     let all_pythons = finder.find_all();

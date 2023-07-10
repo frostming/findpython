@@ -66,14 +66,7 @@ impl Finder {
             .collect()
     }
 
-    pub fn find_all(&self, text: Option<&str>, options: MatchOptions) -> Vec<PythonVersion> {
-        let mut options = options;
-        if let Some(s) = text {
-            if let Some(o) = MatchOptions::from_version(s) {
-                options = o.merge(options);
-            }
-        }
-
+    pub fn find_all(&self, options: MatchOptions) -> Vec<PythonVersion> {
         let pythons = self.find_all_python_versions();
         let mut filtered = vec![];
         for python in pythons {
@@ -84,8 +77,8 @@ impl Finder {
         self.deduplicate(filtered)
     }
 
-    pub fn find(&self, text: Option<&str>, options: MatchOptions) -> Option<PythonVersion> {
-        self.find_all(text, options).first().cloned()
+    pub fn find(&self, options: MatchOptions) -> Option<PythonVersion> {
+        self.find_all(options).first().cloned()
     }
 
     fn deduplicate_key(&self, python: &mut PythonVersion) -> String {
@@ -198,13 +191,9 @@ impl Finder {
         name: Option<String>,
         architecture: Option<String>,
     ) -> Vec<PythonVersion> {
-        let text = if let Some(StringInt::STRING(s)) = &major {
-            Some(s.as_str())
+        let options = if let Some(StringInt::STRING(s)) = &major {
+            MatchOptions::default().version_spec(s)
         } else {
-            None
-        };
-        self.find_all(
-            text,
             MatchOptions {
                 major: if let Some(StringInt::INT(i)) = major {
                     Some(i)
@@ -217,8 +206,9 @@ impl Finder {
                 dev,
                 name,
                 architecture,
-            },
-        )
+            }
+        };
+        self.find_all(options)
     }
 
     #[pyo3(name = "find")]
@@ -232,27 +222,9 @@ impl Finder {
         name: Option<String>,
         architecture: Option<String>,
     ) -> Option<PythonVersion> {
-        let text = if let Some(StringInt::STRING(s)) = &major {
-            Some(s.as_str())
-        } else {
-            None
-        };
-        self.find(
-            text,
-            MatchOptions {
-                major: if let Some(StringInt::INT(i)) = major {
-                    Some(i)
-                } else {
-                    None
-                },
-                minor,
-                patch,
-                pre,
-                dev,
-                name,
-                architecture,
-            },
-        )
+        self.py_find_all(major, minor, patch, pre, dev, name, architecture)
+            .first()
+            .cloned()
     }
 }
 
@@ -268,7 +240,7 @@ pub struct MatchOptions {
 }
 
 impl MatchOptions {
-    pub fn from_version(version: &str) -> Option<Self> {
+    fn from_version(version: &str) -> Option<Self> {
         match VERSION_REGEX.captures(version) {
             Ok(Some(capture)) => Some(Self {
                 major: capture.name("major").map(|m| m.as_str().parse().unwrap()),
@@ -285,16 +257,47 @@ impl MatchOptions {
         }
     }
 
-    pub fn merge(self, other: Self) -> Self {
-        Self {
-            major: other.major.or(self.major),
-            minor: other.minor.or(self.minor),
-            patch: other.patch.or(self.patch),
-            pre: other.pre.or(self.pre),
-            dev: other.dev.or(self.dev),
-            name: other.name.or(self.name),
-            architecture: other.architecture.or(self.architecture),
+    pub fn version_spec(self, version: &str) -> Self {
+        if let Some(res) = Self::from_version(version) {
+            res
+        } else {
+            self.name(version)
         }
+    }
+
+    pub fn major(mut self, major: usize) -> Self {
+        self.major = Some(major);
+        self
+    }
+
+    pub fn minor(mut self, minor: usize) -> Self {
+        self.minor = Some(minor);
+        self
+    }
+
+    pub fn patch(mut self, patch: usize) -> Self {
+        self.patch = Some(patch);
+        self
+    }
+
+    pub fn pre(mut self, pre: bool) -> Self {
+        self.pre = Some(pre);
+        self
+    }
+
+    pub fn dev(mut self, dev: bool) -> Self {
+        self.dev = Some(dev);
+        self
+    }
+
+    pub fn name(mut self, name: &str) -> Self {
+        self.name = Some(name.to_string());
+        self
+    }
+
+    pub fn architecture(mut self, architecture: &str) -> Self {
+        self.architecture = Some(architecture.to_string());
+        self
     }
 }
 
@@ -306,7 +309,7 @@ mod test {
     fn test_find_pythons() {
         let finder = Finder::default();
 
-        let pythons = finder.find_all(None, MatchOptions::default());
+        let pythons = finder.find_all(MatchOptions::default());
         assert!(pythons.len() > 0);
     }
 }

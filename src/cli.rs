@@ -55,12 +55,15 @@ pub fn main(cli: Cli) -> anyhow::Result<()> {
         finder = finder.select_providers(&v)?;
     }
 
+    let mut options = MatchOptions::default();
+    if let Some(version_spec) = cli.version_spec.as_deref() {
+        options = options.version_spec(version_spec);
+    }
+
     let paths = if cli.all {
-        finder.find_all(cli.version_spec.as_deref(), MatchOptions::default())
+        finder.find_all(options)
     } else {
-        finder
-            .find(cli.version_spec.as_deref(), MatchOptions::default())
-            .map_or(vec![], |v| vec![v])
+        finder.find(options).map_or(vec![], |v| vec![v])
     };
 
     if paths.len() == 0 {
