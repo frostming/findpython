@@ -67,20 +67,26 @@ jobs:
 
   macos:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        target: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Build wheels
+          architecture: x64
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build wheels - x86_64
         uses: PyO3/maturin-action@v1
         with:
-          target: ${{ matrix.target }}
-          args: --release --out dist
-          sccache: 'true'
+          target: x86_64
+          args: --release --strip --out dist --sdist
+        env:
+          RUSTFLAGS: "-C link-arg=-undefined -C link-arg=dynamic_lookup"
+      - name: Build wheels - universal2
+        uses: PyO3/maturin-action@v1
+        with:
+          args: --release --strip --universal2 --out dist
+        env:
+          RUSTFLAGS: "-C link-arg=-undefined -C link-arg=dynamic_lookup"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
