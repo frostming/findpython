@@ -4,7 +4,7 @@ use super::Provider;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct RyeProvider {
-    root: PathBuf
+    root: PathBuf,
 }
 
 impl RyeProvider {
@@ -15,11 +15,11 @@ impl RyeProvider {
 
 impl Provider for RyeProvider {
     fn create() -> Option<Self>
-        where
-            Self: Sized {
-        let rye_root = std::env::var_os("RYE_ROOT").or_else(|| {
-            Some(dirs::home_dir()?.join(".rye").into_os_string())
-        })?;
+    where
+        Self: Sized,
+    {
+        let rye_root = std::env::var_os("RYE_ROOT")
+            .or_else(|| Some(dirs::home_dir()?.join(".rye").into_os_string()))?;
         Some(Self::new(rye_root.into()))
     }
 

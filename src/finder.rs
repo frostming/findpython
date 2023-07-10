@@ -128,7 +128,7 @@ impl Finder {
 
 #[cfg(feature = "pyo3")]
 #[derive(FromPyObject)]
-enum StringInt {
+pub enum StringInt {
     STRING(String),
     INT(usize),
 }
@@ -188,7 +188,7 @@ impl Finder {
     }
 
     #[pyo3(name = "find_all")]
-    fn py_find_all(
+    pub fn py_find_all(
         &self,
         major: Option<StringInt>,
         minor: Option<usize>,
@@ -222,7 +222,7 @@ impl Finder {
     }
 
     #[pyo3(name = "find")]
-    fn py_find(
+    pub fn py_find(
         &self,
         major: Option<StringInt>,
         minor: Option<usize>,

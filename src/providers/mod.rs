@@ -4,10 +4,10 @@ use crate::helpers;
 use crate::PythonVersion;
 use lazy_static::lazy_static;
 
+mod asdf;
 mod path;
 mod pyenv;
 mod rye;
-mod asdf;
 
 lazy_static! {
     pub static ref ALL_PROVIDERS: [&'static str; 3] = ["path", "pyenv", "rye"];

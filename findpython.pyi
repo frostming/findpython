@@ -71,3 +71,22 @@ class Finder:
         name: str | None = None,
         architecture: str | None = None,
     ) -> PythonVersion | None: ...
+
+def find_all(
+    major: str | int | None = None,
+    minor: int | None = None,
+    patch: int | None = None,
+    pre: bool | None = None,
+    dev: bool | None = None,
+    name: str | None = None,
+    architecture: str | None = None,
+) -> list[PythonVersion]: ...
+def find(
+    major: str | int | None = None,
+    minor: int | None = None,
+    patch: int | None = None,
+    pre: bool | None = None,
+    dev: bool | None = None,
+    name: str | None = None,
+    architecture: str | None = None,
+) -> PythonVersion | None: ...
