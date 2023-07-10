@@ -1,4 +1,3 @@
-use pyo3::exceptions::PyNotImplementedError;
 use serde::ser::SerializeStruct;
 use std::cell::RefCell;
 use std::fmt;
@@ -7,11 +6,11 @@ use std::time::Duration;
 use std::{hash::Hash, io, path::PathBuf, str::FromStr};
 use wait_timeout::ChildExt;
 
-#[cfg(feature = "pyo3")]
-use pep440_rs::PyVersion;
 use pep440_rs::Version;
 #[cfg(feature = "pyo3")]
-use pyo3::{basic::CompareOp, prelude::*};
+use pep440_rs::PyVersion;
+#[cfg(feature = "pyo3")]
+use pyo3::{basic::CompareOp, exceptions::PyNotImplementedError, prelude::*};
 
 use crate::finder::MatchOptions;
 use crate::helpers::calculate_file_hash;
