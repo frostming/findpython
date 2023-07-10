@@ -5,7 +5,7 @@ use crate::{Finder, MatchOptions};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-struct Cli {
+pub struct Cli {
     /// Return all matching Python versions
     #[arg(short, long)]
     all: bool,
@@ -44,9 +44,7 @@ fn parse_providers(s: &str) -> Result<Vec<String>, String> {
     Ok(names.iter().map(|s| s.to_string()).collect())
 }
 
-pub fn main() -> anyhow::Result<()> {
-    let cli = Cli::parse();
-
+pub fn main(cli: Cli) -> anyhow::Result<()> {
     let mut finder = Finder::default()
         .resolve_symlinks(cli.resolve_symlinks)
         .same_file(cli.same_file)

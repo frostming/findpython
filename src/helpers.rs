@@ -1,6 +1,8 @@
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
-use std::{ffi::OsStr, io, os::macos::fs::MetadataExt, path::PathBuf};
+use std::{ffi::OsStr, io, path::PathBuf};
+
+use faccess::{AccessMode, PathExt};
 
 #[cfg(target_os = "windows")]
 lazy_static! {
@@ -51,15 +53,15 @@ fn looks_like_python(name: &OsStr) -> bool {
 }
 
 fn path_is_known_executable(path: &PathBuf) -> bool {
-    let path_meta = std::fs::metadata(path).unwrap();
-    let mode = path_meta.st_mode();
-    let extension = path.extension().map(|e| e.to_str().unwrap().to_lowercase());
+    if let Ok(path_meta) = path.metadata() {
+        let extension = path.extension().map(|e| e.to_str().unwrap().to_lowercase());
 
-    path_meta.is_file()
-        && mode & 0o400 != 0  // is readable
-        && (mode & 0o100 != 0  // is executable
-            || extension.map_or(true, |e| KNOWN_EXECUTABLES.contains(&e.as_str()))  // has known extension
-        )
+        path_meta.is_file() && path.access(AccessMode::READ | AccessMode::EXECUTE).is_ok()
+            || extension.map_or(true, |e| KNOWN_EXECUTABLES.contains(&e.as_str()))
+    // has known extension
+    } else {
+        false
+    }
 }
 
 pub fn calculate_file_hash(path: &PathBuf) -> Result<String, io::Error> {

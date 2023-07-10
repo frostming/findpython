@@ -1,14 +1,16 @@
 use serde::ser::SerializeStruct;
 use std::cell::RefCell;
+use std::collections::hash_map::DefaultHasher;
 use std::fmt;
+use std::hash::Hasher;
 use std::process::Stdio;
 use std::time::Duration;
 use std::{hash::Hash, io, path::PathBuf, str::FromStr};
 use wait_timeout::ChildExt;
 
-use pep440_rs::Version;
 #[cfg(feature = "pyo3")]
 use pep440_rs::PyVersion;
+use pep440_rs::Version;
 #[cfg(feature = "pyo3")]
 use pyo3::{basic::CompareOp, exceptions::PyNotImplementedError, prelude::*};
 
@@ -305,8 +307,21 @@ impl PythonVersion {
     }
 
     #[getter]
-    fn executable(&self) -> PathBuf {
-        self.executable.clone()
+    fn executable(&self, py: Python<'_>) -> PyResult<PyObject> {
+        Ok(py
+            .import("pathlib")?
+            .getattr("Path")?
+            .call1((&self.executable,))?
+            .to_object(py))
+    }
+
+    #[getter(real_path)]
+    fn py_real_path(&self, py: Python<'_>) -> PyResult<PyObject> {
+        Ok(py
+            .import("pathlib")?
+            .getattr("Path")?
+            .call1((self.real_path(),))?
+            .to_object(py))
     }
 
     #[getter]
@@ -315,13 +330,17 @@ impl PythonVersion {
     }
 
     #[getter(version)]
-    fn py_version(&self) -> Result<PyVersion, io::Error> {
-        self.version().map(|v| PyVersion(v))
+    fn py_version(&self) -> PyResult<PyVersion> {
+        Ok(self.version().map(|v| PyVersion(v))?)
     }
 
     #[getter(interpreter)]
-    fn py_interpreter(&self) -> Result<PathBuf, io::Error> {
-        self.interpreter()
+    fn py_interpreter(&self, py: Python<'_>) -> PyResult<PyObject> {
+        Ok(py
+            .import("pathlib")?
+            .getattr("Path")?
+            .call1((self.interpreter()?,))?
+            .to_object(py))
     }
 
     #[getter(architecture)]
@@ -378,6 +397,12 @@ impl PythonVersion {
                 < (other.version()?, self.executable.to_string_lossy().len())),
             _ => Err(PyNotImplementedError::new_err("Not supported comparison")),
         }
+    }
+
+    fn __hash__(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
     }
 }
 

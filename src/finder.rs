@@ -26,33 +26,21 @@ pub struct Finder {
     same_interpreter: bool,
 }
 
-impl Finder {
-    pub fn new() -> Self {
-        Self {
+impl Default for Finder {
+    fn default() -> Self {
+        let f = Self {
             providers: vec![],
             resolve_symlinks: false,
             same_file: true,
             same_interpreter: true,
-        }
-    }
-}
-
-impl Default for Finder {
-    fn default() -> Self {
-        Self::new().select_providers(&ALL_PROVIDERS[..]).unwrap()
+        };
+        f.select_providers(&ALL_PROVIDERS[..]).unwrap()
     }
 }
 
 impl Finder {
     pub fn select_providers(mut self, names: &[&str]) -> Result<Self, io::Error> {
-        self.providers = names
-            .iter()
-            .map(|n| {
-                get_provider(*n).ok_or_else(|| {
-                    io::Error::new(io::ErrorKind::NotFound, format!("Provider {} not found", n))
-                })
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        self.providers = names.iter().filter_map(|n| get_provider(*n)).collect();
         Ok(self)
     }
 
@@ -157,10 +145,10 @@ impl Finder {
         selected_providers: Option<Vec<String>>,
     ) -> Result<Self, io::Error> {
         let mut f = Self {
-            providers: vec![],
             resolve_symlinks,
             same_file: !no_same_file,
             same_interpreter: !no_same_interpreter,
+            ..Self::default()
         };
         if let Some(names) = selected_providers {
             let names: Vec<&str> = names.iter().map(|v| v.as_str()).collect();
