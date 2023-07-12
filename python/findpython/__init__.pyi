@@ -1,3 +1,4 @@
+import abc
 from pathlib import Path
 from typing import Sequence
 
@@ -71,6 +72,7 @@ class Finder:
         name: str | None = None,
         architecture: str | None = None,
     ) -> PythonVersion | None: ...
+    def add_provider(self, provider: BaseProvider, pos: int | None = None) -> None: ...
 
 def find_all(
     major: str | int | None = None,
@@ -90,3 +92,10 @@ def find(
     name: str | None = None,
     architecture: str | None = None,
 ) -> PythonVersion | None: ...
+
+class BaseProvider(abc.ABC):
+    @abc.abstractmethod
+    def find_pythons(self) -> list[PythonVersion]: ...
+    def find_pythons_from_path(
+        self, path: StrPath, as_interpreter: bool = False
+    ) -> list[PythonVersion]: ...

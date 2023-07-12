@@ -44,7 +44,7 @@ impl Provider for PyenvProvider {
                     Ok(entry) => {
                         let path = entry.path();
                         if path.is_dir() {
-                            self.find_pythons_from_path(&path.join("bin"), true)
+                            super::find_pythons_from_path(&path.join("bin"), true)
                         } else {
                             vec![]
                         }

@@ -9,6 +9,9 @@ mod path;
 mod pyenv;
 mod rye;
 
+#[cfg(feature = "pyo3")]
+pub mod pyobject;
+
 #[cfg(windows)]
 mod winreg;
 
@@ -28,36 +31,6 @@ pub trait Provider: Send + Sync {
         Self: Sized;
 
     fn find_pythons(&self) -> Vec<PythonVersion>;
-
-    /// Find all Python versions under the given path.
-    /// ### Arguments:
-    ///
-    /// path: The path to search for Python versions under.
-    /// as_interpreter: Whether to use the path as an interpreter.
-    ///     Must not be true if it might be a wrapper script.
-    ///
-    /// ### Returns:
-    /// A list of Python versions found under the given path.
-    fn find_pythons_from_path(&self, path: &PathBuf, as_interpreter: bool) -> Vec<PythonVersion> {
-        match path.read_dir() {
-            Ok(entries) => entries
-                .into_iter()
-                .filter_map(|entry| {
-                    let path = entry.ok()?.path();
-                    if helpers::path_is_python(&path) {
-                        let mut python = PythonVersion::new(path.to_owned());
-                        if as_interpreter {
-                            python = python.with_interpreter(path.to_owned());
-                        }
-                        Some(python)
-                    } else {
-                        None
-                    }
-                })
-                .collect(),
-            Err(_) => vec![],
-        }
-    }
 }
 
 pub fn get_provider(name: &str) -> Option<Box<dyn Provider>> {
@@ -69,5 +42,35 @@ pub fn get_provider(name: &str) -> Option<Box<dyn Provider>> {
         #[cfg(windows)]
         "winreg" => winreg::WinRegProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
         _ => None,
+    }
+}
+
+/// Find all Python versions under the given path.
+/// ### Arguments:
+///
+/// path: The path to search for Python versions under.
+/// as_interpreter: Whether to use the path as an interpreter.
+///     Must not be true if it might be a wrapper script.
+///
+/// ### Returns:
+/// A list of Python versions found under the given path.
+pub fn find_pythons_from_path(path: &PathBuf, as_interpreter: bool) -> Vec<PythonVersion> {
+    match path.read_dir() {
+        Ok(entries) => entries
+            .into_iter()
+            .filter_map(|entry| {
+                let path = entry.ok()?.path();
+                if helpers::path_is_python(&path) {
+                    let mut python = PythonVersion::new(path.to_owned());
+                    if as_interpreter {
+                        python = python.with_interpreter(path.to_owned());
+                    }
+                    Some(python)
+                } else {
+                    None
+                }
+            })
+            .collect(),
+        Err(_) => vec![],
     }
 }

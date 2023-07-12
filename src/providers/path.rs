@@ -26,7 +26,7 @@ impl Provider for PathProvider {
     fn find_pythons(&self) -> Vec<PythonVersion> {
         self.paths
             .iter()
-            .flat_map(|path| self.find_pythons_from_path(path, false))
+            .flat_map(|path| super::find_pythons_from_path(path, false))
             .collect()
     }
 }

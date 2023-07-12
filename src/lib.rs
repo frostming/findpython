@@ -8,6 +8,8 @@ mod finder;
 mod helpers;
 mod python;
 
+use std::path::PathBuf;
+
 pub use finder::{Finder, MatchOptions};
 pub use python::PythonVersion;
 
@@ -49,6 +51,13 @@ fn cli_main() -> PyResult<()> {
     Ok(cli::main(args)?)
 }
 
+#[cfg(feature = "pyo3")]
+#[pyfunction]
+#[pyo3(name = "find_pythons_from_path", signature = (path, as_interpreter = false))]
+fn py_find_pythons_from_path(path: PathBuf, as_interpreter: bool) -> Vec<PythonVersion> {
+    providers::find_pythons_from_path(&path, as_interpreter)
+}
+
 /// A Python module implemented in Rust.
 #[cfg(feature = "pyo3")]
 #[pymodule]
@@ -58,5 +67,6 @@ fn findpython(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(find, m)?)?;
     m.add_function(wrap_pyfunction!(find_all, m)?)?;
     m.add_function(wrap_pyfunction!(cli_main, m)?)?;
+    m.add_function(wrap_pyfunction!(py_find_pythons_from_path, m)?)?;
     Ok(())
 }

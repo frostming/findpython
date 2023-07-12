@@ -7,6 +7,9 @@ use lazy_static::lazy_static;
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
+#[cfg(feature = "pyo3")]
+use crate::providers::pyobject::PyObjectProvider;
+
 lazy_static! {
     static ref VERSION_REGEX: Regex = Regex::new(
         r#"(?x)
@@ -148,6 +151,15 @@ impl Finder {
             f = f.select_providers(names.as_slice())?
         }
         Ok(f)
+    }
+
+    fn add_provider(&mut self, provider: PyObject, pos: Option<usize>) {
+        let provider = PyObjectProvider::new(provider);
+        if let Some(pos) = pos {
+            self.providers.insert(pos, Box::new(provider));
+        } else {
+            self.providers.push(Box::new(provider));
+        }
     }
 
     #[getter]

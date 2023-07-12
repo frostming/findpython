@@ -44,7 +44,7 @@ impl Provider for AsdfProvider {
                     Ok(entry) if entry.path().is_dir() => {
                         let path = entry.path().join("bin");
                         if path.is_dir() {
-                            self.find_pythons_from_path(&path, true)
+                            super::find_pythons_from_path(&path, true)
                         } else {
                             vec![]
                         }
