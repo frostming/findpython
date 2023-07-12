@@ -13,11 +13,6 @@ requires-python = ">=3.7"
 license = {text = "MIT"}
 readme = "README.md"
 
-[project.optional-dependencies]
-types = [
-    "pep440-rs>=0.3.11",
-]
-
 [project.scripts]
 findpython = "findpython:cli_main"
 
