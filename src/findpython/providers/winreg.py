@@ -11,7 +11,7 @@ from findpython.utils import WINDOWS
 SYS_ARCHITECTURE = platform.architecture()[0]
 
 
-class Pep514Provider(BaseProvider):
+class WinregProvider(BaseProvider):
     """A provider that finds Python from the winreg."""
 
     @classmethod

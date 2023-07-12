@@ -49,7 +49,7 @@ def cli(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Eliminate the duplicated results with the same sys.executable",
     )
-    parser.add_argument("--provider", type=split_str, help="Select provider(s) to use")
+    parser.add_argument("--providers", type=split_str, help="Select provider(s) to use")
     parser.add_argument("version_spec", nargs="?", help="Python version spec or name")
 
     args = parser.parse_args(argv)
@@ -59,7 +59,7 @@ def cli(argv: list[str] | None = None) -> int:
     finder = Finder(
         resolve_symlinks=args.resolve_symlink,
         no_same_file=args.no_same_file,
-        selected_providers=args.provider,
+        selected_providers=args.providers,
     )
     if args.all:
         find_func = finder.find_all

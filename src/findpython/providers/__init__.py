@@ -7,9 +7,9 @@ from findpython.providers.asdf import AsdfProvider
 from findpython.providers.base import BaseProvider
 from findpython.providers.macos import MacOSProvider
 from findpython.providers.path import PathProvider
-from findpython.providers.pep514 import Pep514Provider
 from findpython.providers.pyenv import PyenvProvider
 from findpython.providers.rye import RyeProvider
+from findpython.providers.winreg import WinregProvider
 
 _providers: list[type[BaseProvider]] = [
     # General:
@@ -17,11 +17,11 @@ _providers: list[type[BaseProvider]] = [
     # Tool Specific:
     AsdfProvider,
     PyenvProvider,
+    RyeProvider,
     # Windows only:
-    Pep514Provider,
+    WinregProvider,
     # MacOS only:
     MacOSProvider,
-    RyeProvider,
 ]
 
 ALL_PROVIDERS = {cls.name(): cls for cls in _providers}

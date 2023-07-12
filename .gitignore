@@ -7,3 +7,5 @@ venv/
 /build/
 /dist/
 *.egg-info/
+/target/
+.pdm-build/
