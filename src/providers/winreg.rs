@@ -1,6 +1,6 @@
+use pep440_rs::Version;
 use std::io::Result;
 use std::str::FromStr;
-use pep440_rs::Version;
 use winreg::enums::*;
 use winreg::RegKey;
 use winreg::HKEY;
@@ -17,7 +17,6 @@ struct PythonRegSource {
     arch: Option<&'static str>,
 }
 
-
 impl PythonRegSource {
     fn get_python(&self, reg: &RegKey) -> Result<PythonVersion> {
         let version = if let Ok(ver) = reg.get_value::<String, _>("Version") {
@@ -25,8 +24,13 @@ impl PythonRegSource {
         } else {
             None
         };
-        let install_path: String = reg.open_subkey_with_flags("InstallPath", KEY_READ | self.flags)?.get_value("ExecutablePath")?;
-        let arch = reg.get_value::<String, _>("SysArchitecture").ok().or_else(|| self.arch.map(|a| a.to_string()));
+        let install_path: String = reg
+            .open_subkey_with_flags("InstallPath", KEY_READ | self.flags)?
+            .get_value("ExecutablePath")?;
+        let arch = reg
+            .get_value::<String, _>("SysArchitecture")
+            .ok()
+            .or_else(|| self.arch.map(|a| a.to_string()));
         let mut py = PythonVersion::new(install_path.into());
         if let Some(arch) = arch {
             py = py.with_architecture(arch.as_str());
@@ -42,17 +46,24 @@ impl PythonRegSource {
     fn find_all(&self) -> Vec<PythonVersion> {
         let hklm = RegKey::predef(self.key);
         let subkey = hklm.open_subkey_with_flags(PYTHON_PATH, KEY_READ | self.flags);
-        
+
         if let Ok(key) = subkey {
             let companies = key.enum_keys().filter_map(|company| {
-                key.open_subkey_with_flags(company.ok()?, KEY_READ | self.flags).ok()
+                key.open_subkey_with_flags(company.ok()?, KEY_READ | self.flags)
+                    .ok()
             });
-            companies.flat_map(|k| {
-                k.enum_keys().filter_map(|tag| {
-                    let py = tag.and_then(|t| k.open_subkey_with_flags(t, KEY_READ | self.flags)).ok()?;
-                    self.get_python(&py).ok()
-                }).collect::<Vec<_>>()
-            }).collect::<Vec<_>>()
+            companies
+                .flat_map(|k| {
+                    k.enum_keys()
+                        .filter_map(|tag| {
+                            let py = tag
+                                .and_then(|t| k.open_subkey_with_flags(t, KEY_READ | self.flags))
+                                .ok()?;
+                            self.get_python(&py).ok()
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .collect::<Vec<_>>()
         } else {
             vec![]
         }
@@ -95,18 +106,24 @@ fn get_sources() -> Vec<PythonRegSource> {
 }
 
 pub struct WinRegProvider {
-    sources: Vec<PythonRegSource>
+    sources: Vec<PythonRegSource>,
 }
 
 impl Provider for WinRegProvider {
     fn create() -> Option<Self>
-        where
-            Self: Sized {
-        Some(Self { sources: get_sources() })
+    where
+        Self: Sized,
+    {
+        Some(Self {
+            sources: get_sources(),
+        })
     }
 
     fn find_pythons(&self) -> Vec<PythonVersion> {
-        self.sources.iter().flat_map(|s| s.find_all()).collect::<Vec<_>>()
+        self.sources
+            .iter()
+            .flat_map(|s| s.find_all())
+            .collect::<Vec<_>>()
     }
 }
 

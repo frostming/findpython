@@ -41,13 +41,17 @@ pub fn main(cli: Cli) -> anyhow::Result<()> {
         .same_interpreter(cli.same_python);
 
     if let Some(names) = cli.providers {
-        let v = names.split(',').into_iter().map(|n| {
-            if !crate::providers::ALL_PROVIDERS.contains(&n) {
-                Err(anyhow!(format!("Provider {} not found", n)))
-            } else {
-                Ok(n)
-            }
-        }).collect::<Result<Vec<_>, _>>()?;
+        let v = names
+            .split(',')
+            .into_iter()
+            .map(|n| {
+                if !crate::providers::ALL_PROVIDERS.contains(&n) {
+                    Err(anyhow!(format!("Provider {} not found", n)))
+                } else {
+                    Ok(n)
+                }
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         finder = finder.select_providers(&v)?;
     }
 
