@@ -54,21 +54,24 @@ pip install findpython
 In addition, FindPython provides a CLI interface to find python versions:
 
 ```
-usage: findpython [-h] [-V] [-a] [--resolve-symlink] [-v] [--no-same-file] [--no-same-python] [version_spec]
+usage: findpython [-h] [-V] [-a] [--resolve-symlink] [-v] [--no-same-file] [--no-same-python] [--providers PROVIDERS]
+                  [version_spec]
 
-Find python files in a directory
+A utility to find python versions on your system
 
 positional arguments:
-  version_spec       Python version spec or name
+  version_spec          Python version spec or name
 
 options:
-  -h, --help         show this help message and exit
-  -V, --version      show program's version number and exit
-  -a, --all          Show all matching python versions
-  --resolve-symlink  Resolve all symlinks
-  -v, --verbose      Verbose output
-  --no-same-file     Eliminate the duplicated results with the same file contents
-  --no-same-python   Eliminate the duplicated results with the same sys.executable
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  -a, --all             Show all matching python versions
+  --resolve-symlink     Resolve all symlinks
+  -v, --verbose         Verbose output
+  --no-same-file        Eliminate the duplicated results with the same file contents
+  --no-same-python      Eliminate the duplicated results with the same sys.executable
+  --providers PROVIDERS
+                        Select provider(s) to use
 ```
 
 ## Integration
@@ -76,10 +79,11 @@ options:
 FindPython finds Python from the following places:
 
 -   `PATH` environment variable
--   pyenv
--   asdf
+-   pyenv install root
+-   asdf python install root
+-   [rye](https://rye-up.com) toolchain install root
 -   `/Library/Frameworks/Python.framework/Versions` (MacOS)
--   winreg (Windows)
+-   Windows registry (Windows only)
 
 ## License
 

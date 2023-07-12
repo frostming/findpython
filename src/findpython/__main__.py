@@ -28,7 +28,9 @@ def cli(argv: list[str] | None = None) -> int:
     """
     Command line interface for findpython.
     """
-    parser = ArgumentParser("findpython", description="Find python files in a directory")
+    parser = ArgumentParser(
+        "findpython", description="A utility to find python versions on your system"
+    )
     parser.add_argument(
         "-V", "--version", action="version", version=f"%(prog)s {__version__}"
     )
