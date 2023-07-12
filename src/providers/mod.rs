@@ -9,6 +9,15 @@ mod path;
 mod pyenv;
 mod rye;
 
+#[cfg(windows)]
+mod winreg;
+
+#[cfg(windows)]
+lazy_static! {
+    pub static ref ALL_PROVIDERS: [&'static str; 4] = ["path", "pyenv", "rye", "winreg"];
+}
+
+#[cfg(not(windows))]
 lazy_static! {
     pub static ref ALL_PROVIDERS: [&'static str; 3] = ["path", "pyenv", "rye"];
 }
@@ -57,6 +66,8 @@ pub fn get_provider(name: &str) -> Option<Box<dyn Provider>> {
         "pyenv" => pyenv::PyenvProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
         "rye" => rye::RyeProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
         "asdf" => asdf::AsdfProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
+        #[cfg(windows)]
+        "winreg" => winreg::WinRegProvider::create().map(|p| Box::new(p) as Box<dyn Provider>),
         _ => None,
     }
 }

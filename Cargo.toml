@@ -4,7 +4,7 @@ crate-type = ["cdylib", "rlib"]
 
 [package]
 name = "findpython"
-version = "1.0.0-alpha.0"
+version = "1.0.0-alpha.1"
 edition = "2021"
 license = "MIT"
 authors = ["Frost Ming <me@frostming.com>"]
@@ -27,6 +27,9 @@ serde_json = "1.0.100"
 shellexpand = "3.1.0"
 wait-timeout = "0.2.0"
 which = "4.4.0"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.50"
 
 [features]
 pyo3 = ["dep:pyo3", "pep440_rs/pyo3"]

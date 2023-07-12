@@ -23,8 +23,8 @@ pub struct Cli {
     same_python: bool,
 
     /// Select provider names(comma-separated) to use
-    #[arg(long, value_parser = parse_providers)]
-    providers: Option<Vec<String>>,
+    #[arg(long)]
+    providers: Option<String>,
 
     /// The output format
     #[arg(short, long, value_parser = ["default", "json", "path"], default_value = "default")]
@@ -34,16 +34,6 @@ pub struct Cli {
     version_spec: Option<String>,
 }
 
-fn parse_providers(s: &str) -> Result<Vec<String>, String> {
-    let names = s.split(',').collect::<Vec<_>>();
-    for name in &names {
-        if !crate::providers::ALL_PROVIDERS.contains(&name) {
-            return Err(format!("Provider {} not found", name));
-        }
-    }
-    Ok(names.iter().map(|s| s.to_string()).collect())
-}
-
 pub fn main(cli: Cli) -> anyhow::Result<()> {
     let mut finder = Finder::default()
         .resolve_symlinks(cli.resolve_symlinks)
@@ -51,7 +41,13 @@ pub fn main(cli: Cli) -> anyhow::Result<()> {
         .same_interpreter(cli.same_python);
 
     if let Some(names) = cli.providers {
-        let v = names.iter().map(|n| n.as_str()).collect::<Vec<_>>();
+        let v = names.split(',').into_iter().map(|n| {
+            if !crate::providers::ALL_PROVIDERS.contains(&n) {
+                Err(anyhow!(format!("Provider {} not found", n)))
+            } else {
+                Ok(n)
+            }
+        }).collect::<Result<Vec<_>, _>>()?;
         finder = finder.select_providers(&v)?;
     }
 

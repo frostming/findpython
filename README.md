@@ -111,7 +111,7 @@ FindPython finds Python from the following places:
 -   `PATH` environment variable
 -   pyenv
 -   asdf
--   winreg (Windows) (🚧 WIP 🚧)
+-   winreg (Windows only)
 -   [Rye] project manager backed by [python-build-standalone]
 
 [rye]: https://rye-up.com

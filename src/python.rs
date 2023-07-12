@@ -116,8 +116,8 @@ impl PythonVersion {
         self
     }
 
-    pub fn with_architecture(mut self, architecture: String) -> Self {
-        self.architecture = RefCell::new(Some(architecture));
+    pub fn with_architecture(mut self, architecture: &str) -> Self {
+        self.architecture = RefCell::new(Some(architecture.to_string()));
         self
     }
 
@@ -303,7 +303,7 @@ impl PythonVersion {
             result = result.with_version(version.0);
         }
         if let Some(architecture) = architecture {
-            result = result.with_architecture(architecture);
+            result = result.with_architecture(architecture.as_str());
         }
         result
     }

@@ -4,12 +4,12 @@ use std::{ffi::OsStr, io, path::PathBuf};
 
 use faccess::{AccessMode, PathExt};
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 lazy_static! {
     static ref KNOWN_EXECUTABLES: [&'static str; 3] = ["exe", "py", "bat"];
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(windows))]
 lazy_static! {
     static ref KNOWN_EXECUTABLES: [&'static str; 6] = ["sh", "bash", "csh", "zsh", "fish", "py"];
 }
