@@ -4,6 +4,8 @@ from typing import Any, Sequence
 
 from _typeshed import StrPath
 
+ALL_PROVIDERS: list[str]
+
 class Version:
     dev: Any
     epoch: Any

@@ -61,12 +61,13 @@ fn py_find_pythons_from_path(path: PathBuf, as_interpreter: bool) -> Vec<PythonV
 /// A Python module implemented in Rust.
 #[cfg(feature = "pyo3")]
 #[pymodule]
-fn findpython(_py: Python, m: &PyModule) -> PyResult<()> {
+fn findpython(py: Python, m: &PyModule) -> PyResult<()> {
     use pep440_rs::PyVersion;  // re-export
 
     m.add_class::<Finder>()?;
     m.add_class::<PyVersion>()?;
     m.add_class::<PythonVersion>()?;
+    m.add("ALL_PROVIDERS", providers::ALL_PROVIDERS.into_py(py))?;
     m.add_function(wrap_pyfunction!(find, m)?)?;
     m.add_function(wrap_pyfunction!(find_all, m)?)?;
     m.add_function(wrap_pyfunction!(cli_main, m)?)?;

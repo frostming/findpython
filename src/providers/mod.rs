@@ -17,12 +17,12 @@ mod winreg;
 
 #[cfg(windows)]
 lazy_static! {
-    pub static ref ALL_PROVIDERS: [&'static str; 4] = ["path", "pyenv", "rye", "winreg"];
+    pub static ref ALL_PROVIDERS: [&'static str; 5] = ["path", "pyenv", "rye", "asdf", "winreg"];
 }
 
 #[cfg(not(windows))]
 lazy_static! {
-    pub static ref ALL_PROVIDERS: [&'static str; 3] = ["path", "pyenv", "rye"];
+    pub static ref ALL_PROVIDERS: [&'static str; 4] = ["path", "pyenv", "rye", "asdf"];
 }
 
 pub trait Provider: Send + Sync {
