@@ -178,7 +178,7 @@ class PythonVersion:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
         version = _run_script(
-            str(self.executable), script, timeout=GET_VERSION_TIMEOUT,
+            str(self.executable), script, timeout=GET_VERSION_TIMEOUT
         ).strip()
         # Dev builds may produce version like `3.11.0+` and packaging.version
         # will reject it. Here we just remove the part after `+`
