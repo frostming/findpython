@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import logging
+import os
 import subprocess
 from functools import lru_cache
 from pathlib import Path
@@ -11,7 +12,7 @@ from packaging.version import InvalidVersion, Version
 from findpython.utils import get_binary_hash
 
 logger = logging.getLogger("findpython")
-GET_VERSION_TIMEOUT = 5
+GET_VERSION_TIMEOUT = float(os.environ.get("FINDPYTHON_GET_VERSION_TIMEOUT", 5))
 
 
 @lru_cache(maxsize=1024)
