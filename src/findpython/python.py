@@ -12,12 +12,7 @@ from packaging.version import InvalidVersion, Version
 from findpython.utils import get_binary_hash
 
 logger = logging.getLogger("findpython")
-_DEFAULT_GET_VERSION_TIMEOUT = 5
-
-
-def get_version_timeout() -> float:
-    """Return the timeout for getting a Python version."""
-    return float(os.environ.get("FINDPYTHON_GET_VERSION_TIMEOUT", _DEFAULT_GET_VERSION_TIMEOUT))
+GET_VERSION_TIMEOUT = float(os.environ.get("FINDPYTHON_GET_VERSION_TIMEOUT", 5))
 
 
 @lru_cache(maxsize=1024)
@@ -183,7 +178,7 @@ class PythonVersion:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
         version = _run_script(
-            str(self.executable), script, timeout=get_version_timeout(),
+            str(self.executable), script, timeout=GET_VERSION_TIMEOUT,
         ).strip()
         # Dev builds may produce version like `3.11.0+` and packaging.version
         # will reject it. Here we just remove the part after `+`
