@@ -12,17 +12,26 @@ __all__ = [
     "REGISTRY_SOURCE_CU",
 ]
 
+import sys
 import re
 from itertools import count
-
-try:
-    import winreg
-except ImportError:
-    import _winreg as winreg
 
 REGISTRY_SOURCE_LM = 1
 REGISTRY_SOURCE_LM_WOW6432 = 2
 REGISTRY_SOURCE_CU = 3
+
+# Simple tests direcly on sys variables are necessary to please mypy
+if sys.platform == "win32":
+    if sys.version_info >= (3,):
+        import winreg
+    else:
+        import _winreg as winreg
+else:
+    def open_source():
+        pass
+
+# Prevents mypy (and python) from parsing further on non-win32 platforms
+assert sys.platform == "win32"
 
 _REG_KEY_INFO = {
     REGISTRY_SOURCE_LM: (
