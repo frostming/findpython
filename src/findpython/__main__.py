@@ -51,6 +51,9 @@ def cli(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Eliminate the duplicated results with the same sys.executable",
     )
+    parser.add_argument(
+        "--pre", "--prereleases", action="store_true", help="Allow prereleases"
+    )
     parser.add_argument("--providers", type=split_str, help="Select provider(s) to use")
     parser.add_argument("version_spec", nargs="?", help="Python version spec or name")
 
@@ -68,7 +71,7 @@ def cli(argv: list[str] | None = None) -> int:
     else:
         find_func = finder.find  # type: ignore[assignment]
 
-    python_versions = find_func(args.version_spec)
+    python_versions = find_func(args.version_spec, allow_prereleases=args.pre)
     if not python_versions:
         print("No matching python version found", file=sys.stderr)
         return 1

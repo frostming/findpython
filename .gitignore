@@ -9,3 +9,4 @@ venv/
 *.egg-info/
 /target/
 .pdm-build/
+/src/findpython/__version__.py

@@ -123,8 +123,8 @@ def get_binary_hash(path: Path) -> str:
 if TYPE_CHECKING:
 
     class VersionDict(TypedDict):
-        pre: bool | None
-        dev: bool | None
+        pre: bool
+        dev: bool
         major: int | None
         minor: int | None
         patch: int | None
