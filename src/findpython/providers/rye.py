@@ -6,7 +6,7 @@ from pathlib import Path
 
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
-from findpython.utils import safe_iter_dir
+from findpython.utils import WINDOWS, safe_iter_dir
 
 
 class RyeProvider(BaseProvider):
@@ -25,6 +25,9 @@ class RyeProvider(BaseProvider):
         for child in safe_iter_dir(py_root):
             if child.is_symlink():  # registered an existing python
                 continue
-            python_bin = child / "install/bin/python3"
+            if WINDOWS:
+                python_bin = child / "install/python.exe"
+            else:
+                python_bin = child / "install/bin/python3"
             if python_bin.exists():
                 yield self.version_maker(python_bin, _interpreter=python_bin)
