@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import PropertyMock
 
 import pytest
 from packaging.version import parse
@@ -50,6 +51,10 @@ def mocked_python(tmp_path, monkeypatch):
         mocked.add_python(*python)
     monkeypatch.setattr(
         "findpython.providers.base.BaseProvider.version_maker", mocked.version_maker
+    )
+    monkeypatch.setattr(
+        "findpython.python.PythonVersion.implementation",
+        PropertyMock(return_value="CPython"),
     )
     ALL_PROVIDERS.clear()
     ALL_PROVIDERS["path"] = PathProvider
