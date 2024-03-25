@@ -4,6 +4,8 @@ import platform
 import typing as t
 from pathlib import Path
 
+from packaging.version import Version
+
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 from findpython.utils import WINDOWS
@@ -33,9 +35,10 @@ class WinregProvider(BaseProvider):
             except AttributeError:
                 continue
             if path.exists():
+                version = getattr(version.info, "version", None)
                 py_ver = self.version_maker(
                     path,
-                    None,
+                    Version(version) if version else None,
                     getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),
                     path,
                 )

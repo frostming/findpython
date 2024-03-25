@@ -64,6 +64,12 @@ class PythonVersion:
             return self.executable
 
     @property
+    def implementation(self) -> str:
+        """Return the implementation of the python."""
+        script = "import platform; print(platform.python_implementation())"
+        return _run_script(str(self.executable), script).strip()
+
+    @property
     def name(self) -> str:
         """Return the name of the python."""
         return self.executable.name
@@ -166,13 +172,21 @@ class PythonVersion:
         return hash(self.executable)
 
     def __repr__(self) -> str:
-        attrs = ("executable", "version", "architecture", "major", "minor", "patch")
+        attrs = (
+            "executable",
+            "version",
+            "architecture",
+            "implementation",
+            "major",
+            "minor",
+            "patch",
+        )
         return "<PythonVersion {}>".format(
             ", ".join(f"{attr}={getattr(self, attr)!r}" for attr in attrs)
         )
 
     def __str__(self) -> str:
-        return f"{self.name} {self.version} @ {self.executable}"
+        return f"{self.implementation:>9}@{self.version}: {self.executable}"
 
     def _get_version(self) -> Version:
         """Get the version of the python."""
