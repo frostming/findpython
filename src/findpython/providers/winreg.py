@@ -35,10 +35,10 @@ class WinregProvider(BaseProvider):
             except AttributeError:
                 continue
             if path.exists():
-                version = getattr(version.info, "version", None)
+                py_version = getattr(version.info, "version", None)
                 py_ver = self.version_maker(
                     path,
-                    Version(version) if version else None,
+                    Version(py_version) if py_version else None,
                     getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),
                     path,
                 )

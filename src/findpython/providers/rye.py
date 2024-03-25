@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import shutil
+import os
 import typing as t
 from pathlib import Path
 
@@ -10,19 +10,18 @@ from findpython.utils import WINDOWS, safe_iter_dir
 
 
 class RyeProvider(BaseProvider):
-    def __init__(self) -> None:
-        self.root = Path.home() / ".rye"
-        self.rye_bin = shutil.which("rye")
+    def __init__(self, root: Path) -> None:
+        self.root = root
 
     @classmethod
     def create(cls) -> t.Self | None:
-        return cls()
+        root = Path(os.getenv("RYE_PY_ROOT", "~/.rye/py")).expanduser()
+        return cls(root)
 
     def find_pythons(self) -> t.Iterable[PythonVersion]:
-        py_root = self.root / "py"
-        if not py_root.exists():
+        if not self.root.exists():
             return
-        for child in safe_iter_dir(py_root):
+        for child in safe_iter_dir(self.root):
             if child.is_symlink():  # registered an existing python
                 continue
             for intermediate in ("", "install/"):
