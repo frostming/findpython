@@ -131,6 +131,7 @@ class PythonVersion:
         dev: bool | None = None,
         name: str | None = None,
         architecture: str | None = None,
+        implementation: str | None = None,
     ) -> bool:
         """
         Return True if the python matches the provided criteria.
@@ -149,6 +150,8 @@ class PythonVersion:
         :type name: str
         :param architecture: The architecture of the python.
         :type architecture: str
+        :param implementation: The implementation of the python.
+        :type implementation: str
         :return: Whether the python matches the provided criteria.
         :rtype: bool
         """
@@ -165,6 +168,11 @@ class PythonVersion:
         if name is not None and self.name != name:
             return False
         if architecture is not None and self.architecture != architecture:
+            return False
+        if (
+            implementation is not None
+            and self.implementation.lower() != implementation.lower()
+        ):
             return False
         return True
 

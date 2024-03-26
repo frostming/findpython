@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from typing import Generator, Sequence, TypedDict
 
 VERSION_RE = re.compile(
-    r"(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?"
+    r"(?:(?P<implementation>\w+)@)?(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?"
     r"(?:(?P<prerel>[abc]|rc|dev)(?:(?P<prerelversion>\d+(?:\.\d+)*))?)"
     r"?(?P<postdev>(\.post(?P<post>\d+))?(\.dev(?P<dev>\d+))?)?"
     r"(?:-(?P<architecture>32|64))?"
@@ -129,6 +129,7 @@ if TYPE_CHECKING:
         minor: int | None
         patch: int | None
         architecture: str | None
+        implementation: str | None
 
 
 def parse_major(version: str) -> VersionDict | None:

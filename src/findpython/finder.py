@@ -66,6 +66,7 @@ class Finder:
         name: str | None = None,
         architecture: str | None = None,
         allow_prereleases: bool = False,
+        implementation: str | None = None,
     ) -> list[PythonVersion]:
         """
         Return all Python versions matching the given version criteria.
@@ -78,6 +79,7 @@ class Finder:
         :param name: The name of the python.
         :param architecture: The architecture of the python.
         :param allow_prereleases: Whether to allow prereleases.
+        :param implementation: The implementation of the python. E.g. "cpython", "pypy".
         :return: a list of PythonVersion objects
         """
         if allow_prereleases and (pre is False or dev is False):
@@ -101,6 +103,7 @@ class Finder:
                     pre = pre or None
                     dev = dev or None
                 architecture = version_dict["architecture"]
+                implementation = version_dict["implementation"]
             else:
                 name, major = major, None
 
@@ -113,6 +116,7 @@ class Finder:
             dev,
             name,
             architecture,
+            implementation,
         )
         # Deduplicate with the python executable path
         matched_python = set(self._find_all_python_versions())
@@ -128,6 +132,7 @@ class Finder:
         name: str | None = None,
         architecture: str | None = None,
         allow_prereleases: bool = False,
+        implementation: str | None = None,
     ) -> PythonVersion | None:
         """
         Return the Python version that is closest to the given version criteria.
@@ -140,12 +145,21 @@ class Finder:
         :param name: The name of the python.
         :param architecture: The architecture of the python.
         :param allow_prereleases: Whether to allow prereleases.
+        :param implementation: The implementation of the python. E.g. "cpython", "pypy".
         :return: a Python object or None
         """
         return next(
             iter(
                 self.find_all(
-                    major, minor, patch, pre, dev, name, architecture, allow_prereleases
+                    major,
+                    minor,
+                    patch,
+                    pre,
+                    dev,
+                    name,
+                    architecture,
+                    allow_prereleases,
+                    implementation,
                 )
             ),
             None,
