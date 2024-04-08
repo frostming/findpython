@@ -16,9 +16,9 @@ GET_VERSION_TIMEOUT = float(os.environ.get("FINDPYTHON_GET_VERSION_TIMEOUT", 5))
 
 
 @lru_cache(maxsize=1024)
-def _run_script(executable: str, script: str, timeout: float | None = None) -> str:
+def _run_script(py_ver: PythonVersion, script: str, timeout: float | None = None) -> str:
     """Run a script and return the output."""
-    command = [executable, "-EsSc", script]
+    command = [py_ver.executable, "-EsSc", script]
     logger.debug("Running script: %s", command)
     return subprocess.run(
         command,
@@ -67,7 +67,7 @@ class PythonVersion:
     def implementation(self) -> str:
         """Return the implementation of the python."""
         script = "import platform; print(platform.python_implementation())"
-        return _run_script(str(self.executable), script).strip()
+        return _run_script(self, script).strip()
 
     @property
     def name(self) -> str:
@@ -177,7 +177,7 @@ class PythonVersion:
         return True
 
     def __hash__(self) -> int:
-        return hash(self.executable)
+        return hash((self.executable, self.executable.stat().st_mtime))
 
     def __repr__(self) -> str:
         attrs = (
@@ -199,9 +199,7 @@ class PythonVersion:
     def _get_version(self) -> Version:
         """Get the version of the python."""
         script = "import platform; print(platform.python_version())"
-        version = _run_script(
-            str(self.executable), script, timeout=GET_VERSION_TIMEOUT
-        ).strip()
+        version = _run_script(self, script, timeout=GET_VERSION_TIMEOUT).strip()
         # Dev builds may produce version like `3.11.0+` and packaging.version
         # will reject it. Here we just remove the part after `+`
         # since it isn't critical for version comparison.
@@ -210,11 +208,11 @@ class PythonVersion:
 
     def _get_architecture(self) -> str:
         script = "import platform; print(platform.architecture()[0])"
-        return _run_script(str(self.executable), script).strip()
+        return _run_script(self, script).strip()
 
     def _get_interpreter(self) -> str:
         script = "import sys; print(sys.executable)"
-        return _run_script(str(self.executable), script).strip()
+        return _run_script(self, script).strip()
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
