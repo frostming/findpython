@@ -36,9 +36,15 @@ class WinregProvider(BaseProvider):
                 continue
             if path.exists():
                 py_version = getattr(version.info, "version", None)
+                parse_version: Version | None = None
+                if py_version:
+                    try:
+                        parse_version = Version(py_version)
+                    except ValueError:
+                        pass
                 py_ver = self.version_maker(
                     path,
-                    Version(py_version) if py_version else None,
+                    parse_version,
                     getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),
                     path,
                 )
