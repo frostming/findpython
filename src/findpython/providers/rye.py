@@ -22,8 +22,6 @@ class RyeProvider(BaseProvider):
         if not self.root.exists():
             return
         for child in safe_iter_dir(self.root):
-            if child.is_symlink():  # registered an existing python
-                continue
             for intermediate in ("", "install/"):
                 if WINDOWS:
                     python_bin = child / (intermediate + "python.exe")
