@@ -1,11 +1,20 @@
 from __future__ import annotations
 
 import os
-import typing as t
 from pathlib import Path
+import sys
+from typing import TYPE_CHECKING
 
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
+
+if TYPE_CHECKING:
+    from typing import Iterable
+
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 
 class PyenvProvider(BaseProvider):
@@ -15,7 +24,7 @@ class PyenvProvider(BaseProvider):
         self.root = root
 
     @classmethod
-    def create(cls) -> t.Self | None:
+    def create(cls) -> Self | None:
         pyenv_root = os.path.expanduser(
             os.path.expandvars(os.getenv("PYENV_ROOT", "~/.pyenv"))
         )
@@ -23,7 +32,7 @@ class PyenvProvider(BaseProvider):
             return None
         return cls(Path(pyenv_root))
 
-    def find_pythons(self) -> t.Iterable[PythonVersion]:
+    def find_pythons(self) -> Iterable[PythonVersion]:
         versions_path = self.root.joinpath("versions")
         if versions_path.exists():
             for version in versions_path.iterdir():

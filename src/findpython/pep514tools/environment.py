@@ -5,7 +5,7 @@
 # Distributed under the terms of the MIT License
 # -------------------------------------------------------------------------
 
-__all__ = ["Environment", "findall", "find", "findone"]
+__all__ = ["Environment", "find", "findall", "findone"]
 
 import sys
 

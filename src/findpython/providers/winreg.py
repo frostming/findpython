@@ -1,14 +1,23 @@
 from __future__ import annotations
 
 import platform
-import typing as t
+import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from packaging.version import Version
 
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 from findpython.utils import WINDOWS
+
+if TYPE_CHECKING:
+    from typing import Iterable
+
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 SYS_ARCHITECTURE = platform.architecture()[0]
 
@@ -17,12 +26,12 @@ class WinregProvider(BaseProvider):
     """A provider that finds Python from the winreg."""
 
     @classmethod
-    def create(cls) -> t.Self | None:
+    def create(cls) -> Self | None:
         if not WINDOWS:
             return None
         return cls()
 
-    def find_pythons(self) -> t.Iterable[PythonVersion]:
+    def find_pythons(self) -> Iterable[PythonVersion]:
         from findpython.pep514tools import findall as pep514_findall
 
         env_versions = pep514_findall()

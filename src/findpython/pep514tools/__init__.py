@@ -10,4 +10,4 @@ __version__ = "0.1.0"
 
 from findpython.pep514tools.environment import find, findall, findone
 
-__all__ = ["findall", "find", "findone"]
+__all__ = ["find", "findall", "findone"]
