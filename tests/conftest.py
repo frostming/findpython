@@ -21,7 +21,7 @@ class _MockRegistry:
         architecture="64bit",
         interpreter=None,
         keep_symlink=False,
-    ):
+    ) -> PythonVersion:
         if version is not None:
             version = parse(version)
         executable = Path(executable)
@@ -34,16 +34,16 @@ class _MockRegistry:
             executable, version, architecture, interpreter, keep_symlink
         )
         if version is not None:
-            py_ver._get_version = lambda: version
+            py_ver._get_version = lambda: version  # type:ignore[method-assign]
         self.versions[executable] = py_ver
         return py_ver
 
-    def version_maker(self, executable, *args, **kwargs):
+    def version_maker(self, executable, *args, **kwargs) -> PythonVersion:
         return self.versions[executable]
 
 
 @pytest.fixture()
-def mocked_python(tmp_path, monkeypatch):
+def mocked_python(tmp_path, monkeypatch) -> _MockRegistry:
     mocked = _MockRegistry()
     for python in [
         (tmp_path / "python3.7", "3.7.0"),
@@ -65,5 +65,5 @@ def mocked_python(tmp_path, monkeypatch):
 
 
 @pytest.fixture(params=[False, True])
-def switch(request):
+def switch(request) -> bool:
     return request.param
