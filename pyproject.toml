@@ -38,7 +38,6 @@ package-dir = "src"
 
 [tool.pdm.dev-dependencies]
 tests = ["pytest"]
-dev = ["mypy"]
 
 [build-system]
 requires = ["pdm-backend"]
