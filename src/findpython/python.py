@@ -218,7 +218,12 @@ class PythonVersion:
 
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
-        return (self.version, len(self.executable.as_posix())) < (
+        return (
+            self.version,
+            int(self.architecture.startswith("64bit")),
+            len(self.executable.as_posix()),
+        ) < (
             other.version,
+            int(other.architecture.startswith("64bit")),
             len(other.executable.as_posix()),
         )
