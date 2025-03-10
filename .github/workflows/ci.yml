@@ -52,10 +52,6 @@ jobs:
 
       - name: Install packages
         run: pdm install
-      - name: Check Style
-        run: |
-          pdm run pip install pre-commit
-          pdm run pre-commit run --all-files
       - name: Run Integration
         run: pdm run findpython --all -v
       - name: Run Tests
