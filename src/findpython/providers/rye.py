@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -10,6 +9,7 @@ from findpython.python import PythonVersion
 from findpython.utils import WINDOWS, safe_iter_dir
 
 if TYPE_CHECKING:
+    import sys
     from typing import Iterable
 
     if sys.version_info >= (3, 11):

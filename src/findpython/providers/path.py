@@ -3,13 +3,13 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 from typing import TYPE_CHECKING
 
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 
 if TYPE_CHECKING:
+    import sys
     from typing import Iterable
 
     if sys.version_info >= (3, 11):

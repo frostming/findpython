@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import sys
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -10,6 +9,7 @@ from findpython.python import PythonVersion
 from findpython.utils import path_is_python, safe_iter_dir
 
 if TYPE_CHECKING:
+    import sys
     from typing import Callable, Iterable
 
     if sys.version_info >= (3, 11):
