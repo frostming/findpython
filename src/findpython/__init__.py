@@ -1,8 +1,9 @@
 """
-    FindPython
-    ~~~~~~~~~~
-    A utility to find python versions on your system
+FindPython
+~~~~~~~~~~
+A utility to find python versions on your system
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeVar
@@ -59,4 +60,4 @@ def register_provider(provider: P) -> P:
     return provider
 
 
-__all__ = ["Finder", "find", "find_all", "PythonVersion", "register_provider"]
+__all__ = ["Finder", "PythonVersion", "find", "find_all", "register_provider"]

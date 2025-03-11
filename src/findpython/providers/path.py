@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import os
-import typing as t
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
+
+if TYPE_CHECKING:
+    import sys
+    from typing import Iterable
+
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 
 @dataclass
@@ -16,10 +25,10 @@ class PathProvider(BaseProvider):
     paths: list[Path]
 
     @classmethod
-    def create(cls) -> t.Self | None:
+    def create(cls) -> Self | None:
         paths = [Path(path) for path in os.getenv("PATH", "").split(os.pathsep) if path]
         return cls(paths)
 
-    def find_pythons(self) -> t.Iterable[PythonVersion]:
+    def find_pythons(self) -> Iterable[PythonVersion]:
         for path in self.paths:
             yield from self.find_pythons_from_path(path)
