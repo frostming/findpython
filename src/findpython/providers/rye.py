@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import os
-import typing as t
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from findpython.providers.base import BaseProvider
 from findpython.python import PythonVersion
 from findpython.utils import WINDOWS, safe_iter_dir
+
+if TYPE_CHECKING:
+    import sys
+    from typing import Iterable
+
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 
 class RyeProvider(BaseProvider):
@@ -14,11 +23,11 @@ class RyeProvider(BaseProvider):
         self.root = root
 
     @classmethod
-    def create(cls) -> t.Self | None:
+    def create(cls) -> Self | None:
         root = Path(os.getenv("RYE_PY_ROOT", "~/.rye/py")).expanduser()
         return cls(root)
 
-    def find_pythons(self) -> t.Iterable[PythonVersion]:
+    def find_pythons(self) -> Iterable[PythonVersion]:
         if not self.root.exists():
             return
         for child in safe_iter_dir(self.root):
