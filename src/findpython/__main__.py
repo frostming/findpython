@@ -37,6 +37,7 @@ def cli(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-a", "--all", action="store_true", help="Show all matching python versions"
     )
+    parser.add_argument("--path", action="store_true", help="Show the path of the python")
     parser.add_argument(
         "--resolve-symlink", action="store_true", help="Resolve all symlinks"
     )
@@ -79,7 +80,7 @@ def cli(argv: list[str] | None = None) -> int:
         python_versions = [python_versions]
     print("Found matching python versions:", file=sys.stderr)
     for python_version in python_versions:
-        print(python_version)
+        print(python_version.executable if args.path else python_version)
     return 0
 
 
