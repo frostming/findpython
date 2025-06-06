@@ -39,6 +39,9 @@ package-dir = "src"
 [tool.pdm.dev-dependencies]
 tests = ["pytest"]
 
+[tool.pdm.scripts]
+test = "pytest tests"
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
