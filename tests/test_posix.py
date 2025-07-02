@@ -1,3 +1,4 @@
+import platform
 import stat
 import sys
 from pathlib import Path
@@ -97,11 +98,15 @@ def test_find_python_from_rye_provider(mocked_python, tmp_path, monkeypatch):
 
 
 def test_find_python_from_uv_provider(mocked_python, tmp_path, monkeypatch):
+    if platform.system() == "Linux":
+        python_root = tmp_path / ".local/share/uv/python"
+    else:  # macos
+        python_root = tmp_path / "Library/Application Support/uv/python"
     python310 = mocked_python.add_python(
-        tmp_path / ".local/share/uv/python/cpython@3.10.9/install/bin/python3", "3.10.9"
+        python_root / "cpython@3.10.9/install/bin/python3", "3.10.9"
     )
     python311 = mocked_python.add_python(
-        tmp_path / ".local/share/uv/python/cpython@3.11.8/bin/python3", "3.11.8"
+        python_root / "cpython@3.11.8/bin/python3", "3.11.8"
     )
     monkeypatch.setenv("HOME", str(tmp_path))
 
@@ -111,13 +116,6 @@ def test_find_python_from_uv_provider(mocked_python, tmp_path, monkeypatch):
 
     find_311 = Finder(selected_providers=["uv"]).find_all(3, 11)
     assert python311 in find_311
-
-    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
-    python310_xdg = mocked_python.add_python(
-        tmp_path / "xdg/uv/python/cpython@3.10.9/install/bin/python3", "3.10.9"
-    )
-    find_310 = Finder(selected_providers=["uv"]).find_all(3, 10)
-    assert python310_xdg in find_310
 
     monkeypatch.setenv("UV_PYTHON_INSTALL_DIR", str(tmp_path / "uv_dir"))
     python311_uv_dir = mocked_python.add_python(
