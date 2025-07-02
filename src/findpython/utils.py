@@ -16,7 +16,7 @@ VERSION_RE = re.compile(
     r"(?:(?P<implementation>\w+)@)?(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>[0-9]+))?)?\.?"
     r"(?:(?P<prerel>[abc]|rc|dev)(?:(?P<prerelversion>\d+(?:\.\d+)*))?)"
     r"?(?P<postdev>(\.post(?P<post>\d+))?(\.dev(?P<dev>\d+))?)?"
-    r"(?:-(?P<architecture>32|64))?"
+    r"(?P<freethreaded>t)?(?:-(?P<architecture>32|64))?"
 )
 WINDOWS = sys.platform == "win32"
 MACOS = sys.platform == "darwin"
@@ -37,7 +37,7 @@ if WINDOWS:
 else:
     KNOWN_EXTS = ("", ".sh", ".bash", ".csh", ".zsh", ".fish", ".py")
 PY_MATCH_STR = (
-    r"((?P<implementation>{0})(?:\d(?:\.?\d\d?[cpm]{{0,3}})?)?"
+    r"((?P<implementation>{0})(?:\d(?:\.?\d\d?(?:[cpm]|td?){{0,3}})?)?"
     r"(?:(?<=\d)-[\d\.]+)*(?!w))(?P<suffix>{1})$".format(
         "|".join(PYTHON_IMPLEMENTATIONS),
         "|".join(KNOWN_EXTS),
@@ -130,6 +130,7 @@ if TYPE_CHECKING:
         patch: int | None
         architecture: str | None
         implementation: str | None
+        freethreaded: bool
 
 
 def parse_major(version: str) -> VersionDict | None:
@@ -140,6 +141,7 @@ def parse_major(version: str) -> VersionDict | None:
     rv = match.groupdict()
     rv["pre"] = bool(rv.pop("prerel"))
     rv["dev"] = bool(rv.pop("dev"))
+    rv["freethreaded"] = bool(rv.pop("freethreaded"))
     for int_values in ("major", "minor", "patch"):
         if rv[int_values] is not None:
             rv[int_values] = int(rv[int_values])

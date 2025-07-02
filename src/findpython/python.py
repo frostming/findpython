@@ -39,6 +39,7 @@ class PythonVersion:
     _architecture: str | None = None
     _interpreter: Path | None = None
     keep_symlink: bool = False
+    _freethreaded: bool | None = None
 
     def is_valid(self) -> bool:
         """Return True if the python is not broken."""
@@ -66,7 +67,7 @@ class PythonVersion:
     @property
     def implementation(self) -> str:
         """Return the implementation of the python."""
-        script = "import platform; print(platform.python_implementation())"
+        script = "import platform; print(platform.python_implementation().lower())"
         return _run_script(str(self.executable), script).strip()
 
     @property
@@ -118,6 +119,12 @@ class PythonVersion:
             self._architecture = self._get_architecture()
         return self._architecture
 
+    @property
+    def freethreaded(self) -> bool:
+        if self._freethreaded is None:
+            self._freethreaded = self._get_freethreaded()
+        return self._freethreaded
+
     def binary_hash(self) -> str:
         """Return the binary hash of the python."""
         return get_binary_hash(self.real_path)
@@ -132,6 +139,7 @@ class PythonVersion:
         name: str | None = None,
         architecture: str | None = None,
         implementation: str | None = None,
+        freethreaded: bool | None = None,
     ) -> bool:
         """
         Return True if the python matches the provided criteria.
@@ -152,6 +160,8 @@ class PythonVersion:
         :type architecture: str
         :param implementation: The implementation of the python.
         :type implementation: str
+        :param freethreaded: Whether the python is freethreaded.
+        :type freethreaded: bool
         :return: Whether the python matches the provided criteria.
         :rtype: bool
         """
@@ -174,6 +184,8 @@ class PythonVersion:
             and self.implementation.lower() != implementation.lower()
         ):
             return False
+        if freethreaded is not None and self.freethreaded != freethreaded:
+            return False
         return True
 
     def __hash__(self) -> int:
@@ -188,13 +200,21 @@ class PythonVersion:
             "major",
             "minor",
             "patch",
+            "freethreaded",
         )
         return "<PythonVersion {}>".format(
             ", ".join(f"{attr}={getattr(self, attr)!r}" for attr in attrs)
         )
 
+    def display(self) -> str:
+        threaded_flag = "t" if self.freethreaded else ""
+        return (
+            f"{self.implementation:>9}@{self.version}{threaded_flag}: {self.executable}"
+        )
+
     def __str__(self) -> str:
-        return f"{self.implementation:>9}@{self.version}: {self.executable}"
+        threaded_flag = "t" if self.freethreaded else ""
+        return f"{self.implementation}@{self.version}{threaded_flag}"
 
     def _get_version(self) -> Version:
         """Get the version of the python."""
@@ -216,14 +236,22 @@ class PythonVersion:
         script = "import sys; print(sys.executable)"
         return _run_script(str(self.executable), script).strip()
 
+    def _get_freethreaded(self) -> bool:
+        script = (
+            'import sysconfig;print(sysconfig.get_config_var("Py_GIL_DISABLED") or 0)'
+        )
+        return _run_script(str(self.executable), script).strip() == "1"
+
     def __lt__(self, other: PythonVersion) -> bool:
         """Sort by the version, then by length of the executable path."""
         return (
             self.version,
             int(self.architecture.startswith("64bit")),
             len(self.executable.as_posix()),
+            self.freethreaded,
         ) < (
             other.version,
             int(other.architecture.startswith("64bit")),
             len(other.executable.as_posix()),
+            other.freethreaded,
         )

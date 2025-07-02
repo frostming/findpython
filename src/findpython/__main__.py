@@ -80,7 +80,7 @@ def cli(argv: list[str] | None = None) -> int:
         python_versions = [python_versions]
     print("Found matching python versions:", file=sys.stderr)
     for python_version in python_versions:
-        print(python_version.executable if args.path else python_version)
+        print(python_version.executable if args.path else python_version.display())
     return 0
 
 
