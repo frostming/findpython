@@ -21,6 +21,7 @@ class _MockRegistry:
         architecture="64bit",
         interpreter=None,
         keep_symlink=False,
+        freethreaded=False,
     ) -> PythonVersion:
         if version is not None:
             version = parse(version)
@@ -31,7 +32,7 @@ class _MockRegistry:
         executable.touch(exist_ok=True)
         executable.chmod(0o744)
         py_ver = PythonVersion(
-            executable, version, architecture, interpreter, keep_symlink
+            executable, version, architecture, interpreter, keep_symlink, freethreaded
         )
         if version is not None:
             py_ver._get_version = lambda: version  # type:ignore[method-assign]
@@ -56,7 +57,7 @@ def mocked_python(tmp_path, monkeypatch) -> _MockRegistry:
     )
     monkeypatch.setattr(
         "findpython.python.PythonVersion.implementation",
-        PropertyMock(return_value="CPython"),
+        PropertyMock(return_value="cpython"),
     )
     ALL_PROVIDERS.clear()
     ALL_PROVIDERS["path"] = PathProvider
