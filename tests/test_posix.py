@@ -98,7 +98,7 @@ def test_find_python_from_rye_provider(mocked_python, tmp_path, monkeypatch):
 
 
 def test_find_python_from_uv_provider(mocked_python, tmp_path, monkeypatch):
-    if platform.system() == "Linux":
+    if platform.system() == "Linux" or platform.system() == "SunOS":
         python_root = tmp_path / ".local/share/uv/python"
     else:  # macos
         python_root = tmp_path / "Library/Application Support/uv/python"
