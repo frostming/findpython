@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -19,7 +20,11 @@ if TYPE_CHECKING:
     else:
         from typing_extensions import Self
 
-SYS_ARCHITECTURE = platform.architecture()[0]
+
+@lru_cache
+def sys_architecture() -> str:
+    """Return the system architecture."""
+    return platform.architecture()[0]
 
 
 class WinregProvider(BaseProvider):
@@ -35,6 +40,7 @@ class WinregProvider(BaseProvider):
         from findpython.pep514tools import findall as pep514_findall
 
         env_versions = pep514_findall()
+        sys_arch = sys_architecture()
         for version in env_versions:
             install_path = getattr(version.info, "install_path", None)
             if install_path is None:
@@ -54,7 +60,7 @@ class WinregProvider(BaseProvider):
                 py_ver = self.version_maker(
                     path,
                     parse_version,
-                    getattr(version.info, "sys_architecture", SYS_ARCHITECTURE),
+                    getattr(version.info, "sys_architecture", sys_arch),
                     path,
                 )
                 yield py_ver
