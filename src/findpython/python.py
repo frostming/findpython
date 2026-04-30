@@ -18,7 +18,7 @@ GET_VERSION_TIMEOUT = float(os.environ.get("FINDPYTHON_GET_VERSION_TIMEOUT", 5))
 @lru_cache(maxsize=1024)
 def _run_script(executable: str, script: str, timeout: float | None = None) -> str:
     """Run a script and return the output."""
-    command = [executable, "-EsSc", script]
+    command = [executable, "-Ic", script]
     logger.debug("Running script: %s", command)
     return subprocess.run(
         command,
