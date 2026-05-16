@@ -1,5 +1,7 @@
 import os
+import subprocess
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from packaging.version import Version
@@ -71,6 +73,23 @@ def test_find_python_exclude_invalid(mocked_python, tmp_path):
     all_pythons = finder.find_all()
     assert len(all_pythons) == 3
     assert python not in all_pythons
+
+
+def test_find_python_skips_invalid_before_interpreter_dedup(mocked_python, tmp_path):
+    python = mocked_python.add_python(tmp_path / "python2.7")
+    get_interpreter = Mock(
+        side_effect=subprocess.CalledProcessError(
+            2, [str(python.executable), "-Ic", "import sys; print(sys.executable)"]
+        )
+    )
+    python._get_interpreter = get_interpreter
+
+    finder = Finder(no_same_interpreter=True)
+    all_pythons = finder.find_all()
+
+    assert len(all_pythons) == 3
+    assert python not in all_pythons
+    get_interpreter.assert_not_called()
 
 
 def test_find_python_deduplicate_same_file(mocked_python, tmp_path, switch):

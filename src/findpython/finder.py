@@ -205,11 +205,9 @@ class Finder:
                 python_version = dataclasses.replace(
                     python_version, executable=python_version.real_path
                 )
+            if not python_version.is_valid() or not version_matcher(python_version):
+                continue
             key = dedup_key(python_version)
-            if (
-                key not in result
-                and python_version.is_valid()
-                and version_matcher(python_version)
-            ):
+            if key not in result:
                 result[key] = python_version
         return sorted(result.values(), reverse=True)
