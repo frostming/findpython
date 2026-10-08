@@ -115,6 +115,22 @@ def test_find_python_deduplicate_same_interpreter(mocked_python, tmp_path, switc
     assert (python in all_pythons) is not switch
 
 
+@pytest.mark.parametrize("resolve_symlinks", [False, True])
+def test_find_python_deduplicate_interpreters_skips_broken(
+    python_shims, switch, resolve_symlinks
+):
+    executables, independent_python = python_shims
+    finder = Finder(
+        no_same_interpreter=switch,
+        resolve_symlinks=resolve_symlinks,
+        selected_providers=["path"],
+    )
+    found = {python.executable for python in finder.find_all()}
+    assert len(found) == (2 if switch else 4 - resolve_symlinks)
+    assert found <= set(executables)
+    assert independent_python in found
+
+
 def test_find_python_from_pyenv(mocked_python, tmp_path, monkeypatch):
     register_provider(PyenvProvider)
     python = mocked_python.add_python(

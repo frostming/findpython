@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+import shlex
+import sys
+import venv
 from pathlib import Path
 from unittest.mock import PropertyMock
 
@@ -68,3 +72,34 @@ def mocked_python(tmp_path, monkeypatch) -> _MockRegistry:
 @pytest.fixture(params=[False, True])
 def switch(request) -> bool:
     return request.param
+
+
+@pytest.fixture()
+def python_shims(tmp_path, monkeypatch):
+    if os.name == "nt":
+        pytest.skip("Shell wrappers and symlinks require POSIX")
+
+    independent_install = tmp_path / "independent install"
+    venv.EnvBuilder(with_pip=False).create(independent_install)
+    interpreters = [
+        Path(sys.executable),
+        Path(sys.executable),
+        independent_install / "bin" / "python",
+    ]
+    paths = [tmp_path / f"wrapper {index}" for index in range(len(interpreters))]
+    executables = []
+    for path, interpreter in zip(paths, interpreters):
+        path.mkdir()
+        executable = path / "python3"
+        executable.write_text(f'#!/bin/sh\nexec {shlex.quote(str(interpreter))} "$@"\n')
+        executable.chmod(0o755)
+        executables.append(executable)
+
+    alias = paths[0] / "python"
+    alias.symlink_to("python3")
+    executables.append(alias)
+    broken = paths[0] / "python3.13"
+    broken.write_text("#!/bin/sh\nexit 1\n")
+    broken.chmod(0o755)
+    monkeypatch.setenv("PATH", os.pathsep.join(str(path) for path in paths))
+    return executables, executables[2]
