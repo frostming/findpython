@@ -8,19 +8,19 @@ dependencies = [
     "packaging>=20",
     "platformdirs>=4.3.6",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 readme = "README.md"
 dynamic = ["version"]
 
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 
 [project.urls]
@@ -68,7 +68,7 @@ exclude = '''
 line-length = 90
 src = ["src"]
 exclude = ["tests/fixtures"]
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
