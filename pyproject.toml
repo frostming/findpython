@@ -37,8 +37,13 @@ write_template = "__version__ = \"{}\"\n"
 [tool.pdm.build]
 package-dir = "src"
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 tests = ["pytest"]
+lint = [
+    "pre-commit",
+    # when updating, update pin in .pre-commit-config.yaml
+    "ruff==0.9.7"
+]
 
 [tool.pdm.scripts]
 test = "pytest tests"
