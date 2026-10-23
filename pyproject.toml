@@ -37,8 +37,13 @@ write_template = "__version__ = \"{}\"\n"
 [tool.pdm.build]
 package-dir = "src"
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 tests = ["pytest"]
+lint = [
+    "pre-commit",
+    # when updating, update pin in .pre-commit-config.yaml
+    "ruff==0.17.1"
+]
 
 [tool.pdm.scripts]
 test = "pytest tests"
@@ -46,23 +51,6 @@ test = "pytest tests"
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-[tool.black]
-line-length = 90
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-  | src/pythonfinder/_vendor
-)
-'''
 
 [tool.ruff]
 line-length = 90
