@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
@@ -28,6 +28,8 @@ jobs:
 
       - name: Install packages
         run: pdm install
+      - name: Run Pre-Commit Tests
+        uses: pre-commit/action@v3.0.0
       - name: Run Integration
         run: pdm run findpython --all -v
       - name: Run Tests
