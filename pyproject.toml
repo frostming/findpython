@@ -40,7 +40,7 @@ package-dir = "src"
 [dependency-groups]
 tests = ["pytest"]
 lint = [
-    "pre-commit",
+    "prek",
     # when updating, update pin in .pre-commit-config.yaml
     "ruff==0.17.1"
 ]

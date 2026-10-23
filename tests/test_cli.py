@@ -8,7 +8,7 @@ def test_cli_find_pythons(mocked_python, capsys):
     assert retcode == 0
     out, _ = capsys.readouterr()
     lines = out.strip().splitlines()
-    for version, line in zip(("3.9", "3.8", "3.7"), lines):
+    for version, line in zip(("3.9", "3.8", "3.7"), lines, strict=False):
         assert line.lstrip().startswith(f"cpython@{version}.0")
 
 
