@@ -1,6 +1,7 @@
 """
 This package contains all the providers for the pythonfinder module.
 """
+
 from __future__ import annotations
 
 from findpython.providers.asdf import AsdfProvider
@@ -9,6 +10,7 @@ from findpython.providers.macos import MacOSProvider
 from findpython.providers.path import PathProvider
 from findpython.providers.pyenv import PyenvProvider
 from findpython.providers.rye import RyeProvider
+from findpython.providers.uv import UvProvider
 from findpython.providers.winreg import WinregProvider
 
 _providers: list[type[BaseProvider]] = [
@@ -18,6 +20,7 @@ _providers: list[type[BaseProvider]] = [
     AsdfProvider,
     PyenvProvider,
     RyeProvider,
+    UvProvider,
     # Windows only:
     WinregProvider,
     # MacOS only:

@@ -2,6 +2,7 @@
 *.py[cod]
 __pycache__/
 venv/
+.venv/
 .tox/
 .vscode/
 /build/
@@ -9,3 +10,4 @@ venv/
 *.egg-info/
 /target/
 .pdm-build/
+/src/findpython/__version__.py

@@ -1,3 +1,4 @@
+import platform
 import stat
 import sys
 from pathlib import Path
@@ -9,6 +10,7 @@ from findpython.finder import Finder
 from findpython.providers.asdf import AsdfProvider
 from findpython.providers.pyenv import PyenvProvider
 from findpython.providers.rye import RyeProvider
+from findpython.providers.uv import UvProvider
 
 if sys.platform == "win32":
     pytest.skip("Skip POSIX tests on Windows", allow_module_level=True)
@@ -82,8 +84,42 @@ def test_find_python_from_rye_provider(mocked_python, tmp_path, monkeypatch):
     python310 = mocked_python.add_python(
         tmp_path / ".rye/py/cpython@3.10.9/install/bin/python3", "3.10.9"
     )
+    python311 = mocked_python.add_python(
+        tmp_path / ".rye/py/cpython@3.11.8/bin/python3", "3.11.8"
+    )
     monkeypatch.setenv("HOME", str(tmp_path))
 
     register_provider(RyeProvider)
-    pythons = Finder(selected_providers=["rye"]).find_all(3, 10)
-    assert python310 in pythons
+    find_310 = Finder(selected_providers=["rye"]).find_all(3, 10)
+    assert python310 in find_310
+
+    find_311 = Finder(selected_providers=["rye"]).find_all(3, 11)
+    assert python311 in find_311
+
+
+def test_find_python_from_uv_provider(mocked_python, tmp_path, monkeypatch):
+    if platform.system() == "Linux" or platform.system() == "SunOS":
+        python_root = tmp_path / ".local/share/uv/python"
+    else:  # macos
+        python_root = tmp_path / "Library/Application Support/uv/python"
+    python310 = mocked_python.add_python(
+        python_root / "cpython@3.10.9/install/bin/python3", "3.10.9"
+    )
+    python311 = mocked_python.add_python(
+        python_root / "cpython@3.11.8/bin/python3", "3.11.8"
+    )
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    register_provider(UvProvider)
+    find_310 = Finder(selected_providers=["uv"]).find_all(3, 10)
+    assert python310 in find_310
+
+    find_311 = Finder(selected_providers=["uv"]).find_all(3, 11)
+    assert python311 in find_311
+
+    monkeypatch.setenv("UV_PYTHON_INSTALL_DIR", str(tmp_path / "uv_dir"))
+    python311_uv_dir = mocked_python.add_python(
+        tmp_path / "uv_dir/cpython@3.11.8/bin/python3", "3.11.8"
+    )
+    find_311 = Finder(selected_providers=["uv"]).find_all(3, 11)
+    assert python311_uv_dir in find_311

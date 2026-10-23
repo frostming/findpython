@@ -82,6 +82,7 @@ FindPython finds Python from the following places:
 -   pyenv install root
 -   asdf python install root
 -   [rye](https://rye-up.com) toolchain install root
+-   [uv](https://docs.astral.sh/uv/) toolchain install root
 -   `/Library/Frameworks/Python.framework/Versions` (MacOS)
 -   Windows registry (Windows only)
 

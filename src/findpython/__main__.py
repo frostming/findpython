@@ -37,6 +37,7 @@ def cli(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-a", "--all", action="store_true", help="Show all matching python versions"
     )
+    parser.add_argument("--path", action="store_true", help="Show the path of the python")
     parser.add_argument(
         "--resolve-symlink", action="store_true", help="Resolve all symlinks"
     )
@@ -50,6 +51,9 @@ def cli(argv: list[str] | None = None) -> int:
         "--no-same-python",
         action="store_true",
         help="Eliminate the duplicated results with the same sys.executable",
+    )
+    parser.add_argument(
+        "--pre", "--prereleases", action="store_true", help="Allow prereleases"
     )
     parser.add_argument("--providers", type=split_str, help="Select provider(s) to use")
     parser.add_argument("version_spec", nargs="?", help="Python version spec or name")
@@ -68,7 +72,7 @@ def cli(argv: list[str] | None = None) -> int:
     else:
         find_func = finder.find  # type: ignore[assignment]
 
-    python_versions = find_func(args.version_spec)
+    python_versions = find_func(args.version_spec, allow_prereleases=args.pre)
     if not python_versions:
         print("No matching python version found", file=sys.stderr)
         return 1
@@ -76,7 +80,7 @@ def cli(argv: list[str] | None = None) -> int:
         python_versions = [python_versions]
     print("Found matching python versions:", file=sys.stderr)
     for python_version in python_versions:
-        print(python_version)
+        print(python_version.executable if args.path else python_version.display())
     return 0
 
 

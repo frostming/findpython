@@ -1,3 +1,4 @@
+# mypy: disable-error-code="attr-defined"
 # -------------------------------------------------------------------------
 # Copyright (c) Steve Dower
 # All rights reserved.
@@ -6,10 +7,10 @@
 # -------------------------------------------------------------------------
 
 __all__ = [
-    "open_source",
+    "REGISTRY_SOURCE_CU",
     "REGISTRY_SOURCE_LM",
     "REGISTRY_SOURCE_LM_WOW6432",
-    "REGISTRY_SOURCE_CU",
+    "open_source",
 ]
 
 import sys

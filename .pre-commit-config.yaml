@@ -14,13 +14,13 @@ exclude: >
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.0.276'
+    rev: 'v0.9.7'
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --show-fixes]
 
   - repo: https://github.com/ambv/black
-    rev: 23.3.0
+    rev: 24.8.0
     hooks:
       - id: black
 
