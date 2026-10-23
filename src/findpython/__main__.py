@@ -65,6 +65,7 @@ def cli(argv: list[str] | None = None) -> int:
     finder = Finder(
         resolve_symlinks=args.resolve_symlink,
         no_same_file=args.no_same_file,
+        no_same_interpreter=args.no_same_python,
         selected_providers=args.providers,
     )
     if args.all:
