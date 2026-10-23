@@ -6,23 +6,15 @@ on:
       - "*"
 
 jobs:
-  release-pypi:
-    name: release-pypi
+  build:
+    name: Build distribution
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npx changelogithub
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
       - name: Build artifacts
@@ -34,6 +26,41 @@ jobs:
           . fresh_env/bin/activate
           pip install dist/*.whl
           findpython --all
-      - name: Upload to Pypi
-        run: |
-          pipx run twine upload --username __token__ --password ${{ secrets.PYPI_TOKEN }} dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  changelog:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - run: npx changelogithub
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -88,7 +88,7 @@ def python_shims(tmp_path, monkeypatch):
     ]
     paths = [tmp_path / f"wrapper {index}" for index in range(len(interpreters))]
     executables = []
-    for path, interpreter in zip(paths, interpreters):
+    for path, interpreter in zip(paths, interpreters, strict=True):
         path.mkdir()
         executable = path / "python3"
         executable.write_text(f'#!/bin/sh\nexec {shlex.quote(str(interpreter))} "$@"\n')
