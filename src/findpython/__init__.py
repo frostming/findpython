@@ -18,7 +18,7 @@ def find(*args, **kwargs) -> PythonVersion | None:
     """
     Return the Python version that is closest to the given version criteria.
 
-    :param major: The major version or the version string or the name to match.
+    :param major: The major version, version string, executable name, or SpecifierSet.
     :param minor: The minor version to match.
     :param patch: The micro version to match.
     :param pre: Whether the python is a prerelease.
@@ -34,7 +34,7 @@ def find_all(*args, **kwargs) -> list[PythonVersion]:
     """
     Return all Python versions matching the given version criteria.
 
-    :param major: The major version or the version string or the name to match.
+    :param major: The major version, version string, executable name, or SpecifierSet.
     :param minor: The minor version to match.
     :param patch: The micro version to match.
     :param pre: Whether the python is a prerelease.

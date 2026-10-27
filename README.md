@@ -49,6 +49,23 @@ pip install findpython
 [<PythonVersion executable=PosixPath('/opt/homebrew/bin/python3.9'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/opt/homebrew/bin/python3'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/Users/fming/Library/PythonUp/cmd/python3.9'), version=<Version('3.9.9')>, architecture='64bit', major=3, minor=9, patch=9>, <PythonVersion executable=PosixPath('/usr/local/bin/python3.9'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>, <PythonVersion executable=PosixPath('/usr/local/bin/python3'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>]
 ```
 
+The Python API also accepts a `packaging.specifiers.SpecifierSet` object to select
+versions within a range:
+
+```python
+from packaging.specifiers import SpecifierSet
+import findpython
+
+python = findpython.find(SpecifierSet(">=3.10,<3.14"))
+pythons = findpython.find_all(SpecifierSet("~=3.12.0"))
+```
+
+Ranges use `SpecifierSet` membership and its prerelease policy. Passing
+`allow_prereleases=True` explicitly allows matching prereleases; other criteria,
+such as architecture and implementation, still apply. Existing string arguments
+remain version strings or executable names; comparator strings are not parsed
+as ranges by the Python API or CLI.
+
 ## CLI Usage
 
 In addition, FindPython provides a CLI interface to find python versions:
