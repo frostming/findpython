@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import dataclasses
 import logging
-import operator
 from typing import Callable, Iterable
+
+from packaging.specifiers import SpecifierSet
 
 from findpython.providers import ALL_PROVIDERS, BaseProvider
 from findpython.python import PythonVersion
@@ -59,7 +60,7 @@ class Finder:
 
     def find_all(
         self,
-        major: int | str | None = None,
+        major: int | str | SpecifierSet | None = None,
         minor: int | None = None,
         patch: int | None = None,
         pre: bool | None = None,
@@ -73,7 +74,7 @@ class Finder:
         """
         Return all Python versions matching the given version criteria.
 
-        :param major: The major version or the version string or the name to match.
+        :param major: The major version, version string, executable name, or SpecifierSet.
         :param minor: The minor version to match.
         :param patch: The micro version to match.
         :param pre: Whether the python is a prerelease.
@@ -89,6 +90,10 @@ class Finder:
             raise ValueError(
                 "If allow_prereleases is True, pre and dev must not be False."
             )
+        specifier = None
+        if isinstance(major, SpecifierSet):
+            specifier = major
+            major = None
         if isinstance(major, str):
             if any(v is not None for v in (minor, patch, pre, dev, name)):
                 raise ValueError(
@@ -111,25 +116,31 @@ class Finder:
             else:
                 name, major = major, None
 
-        version_matcher = operator.methodcaller(
-            "matches",
-            major,
-            minor,
-            patch,
-            pre,
-            dev,
-            name,
-            architecture,
-            implementation,
-            freethreaded,
-        )
+        def version_matcher(python: PythonVersion) -> bool:
+            return python.matches(
+                major,
+                minor,
+                patch,
+                pre,
+                dev,
+                name,
+                architecture,
+                implementation,
+                freethreaded,
+            ) and (
+                specifier is None
+                or specifier.contains(
+                    python.version, prereleases=True if allow_prereleases else None
+                )
+            )
+
         # Deduplicate with the python executable path
         matched_python = set(self._find_all_python_versions())
         return self._dedup(matched_python, version_matcher)
 
     def find(
         self,
-        major: int | str | None = None,
+        major: int | str | SpecifierSet | None = None,
         minor: int | None = None,
         patch: int | None = None,
         pre: bool | None = None,
@@ -142,7 +153,7 @@ class Finder:
         """
         Return the Python version that is closest to the given version criteria.
 
-        :param major: The major version or the version string or the name to match.
+        :param major: The major version, version string, executable name, or SpecifierSet.
         :param minor: The minor version to match.
         :param patch: The micro version to match.
         :param pre: Whether the python is a prerelease.
