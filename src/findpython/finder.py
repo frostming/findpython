@@ -105,9 +105,10 @@ class Finder:
                 if allow_prereleases:
                     pre = pre or None
                     dev = dev or None
-                architecture = version_dict["architecture"]
-                implementation = version_dict["implementation"]
-                freethreaded = version_dict["freethreaded"]
+                architecture = version_dict["architecture"] or architecture
+                implementation = version_dict["implementation"] or implementation
+                if version_dict["freethreaded"] or freethreaded is None:
+                    freethreaded = version_dict["freethreaded"]
             else:
                 name, major = major, None
 
@@ -138,6 +139,7 @@ class Finder:
         architecture: str | None = None,
         allow_prereleases: bool = False,
         implementation: str | None = None,
+        freethreaded: bool | None = None,
     ) -> PythonVersion | None:
         """
         Return the Python version that is closest to the given version criteria.
@@ -151,6 +153,7 @@ class Finder:
         :param architecture: The architecture of the python.
         :param allow_prereleases: Whether to allow prereleases.
         :param implementation: The implementation of the python. E.g. "cpython", "pypy".
+        :param freethreaded: Whether the python is freethreaded.
         :return: a Python object or None
         """
         return next(
@@ -165,6 +168,7 @@ class Finder:
                     architecture,
                     allow_prereleases,
                     implementation,
+                    freethreaded,
                 )
             ),
             None,
