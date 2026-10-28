@@ -25,6 +25,8 @@ def find(*args, **kwargs) -> PythonVersion | None:
     :param dev: Whether the python is a devrelease.
     :param name: The name of the python.
     :param architecture: The architecture of the python.
+    :param implementation: The implementation of the python.
+    :param freethreaded: Whether the python is freethreaded.
     :return: a Python object or None
     """
     return Finder().find(*args, **kwargs)
@@ -41,6 +43,8 @@ def find_all(*args, **kwargs) -> list[PythonVersion]:
     :param dev: Whether the python is a devrelease.
     :param name: The name of the python.
     :param architecture: The architecture of the python.
+    :param implementation: The implementation of the python.
+    :param freethreaded: Whether the python is freethreaded.
     :return: a list of PythonVersion objects
     """
     return Finder().find_all(*args, **kwargs)

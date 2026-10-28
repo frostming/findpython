@@ -49,6 +49,17 @@ pip install findpython
 [<PythonVersion executable=PosixPath('/opt/homebrew/bin/python3.9'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/opt/homebrew/bin/python3'), version=<Version('3.9.10')>, architecture='64bit', major=3, minor=9, patch=10>, <PythonVersion executable=PosixPath('/Users/fming/Library/PythonUp/cmd/python3.9'), version=<Version('3.9.9')>, architecture='64bit', major=3, minor=9, patch=9>, <PythonVersion executable=PosixPath('/usr/local/bin/python3.9'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>, <PythonVersion executable=PosixPath('/usr/local/bin/python3'), version=<Version('3.9.5')>, architecture='64bit', major=3, minor=9, patch=5>]
 ```
 
+The Python API accepts additional interpreter filters with a version string:
+
+```python
+findpython.find("3.13", implementation="cpython", freethreaded=True)
+findpython.find_all("3.13", architecture="64bit")
+```
+
+Architecture, implementation, or a `t` suffix embedded in the version string take
+precedence over the corresponding keyword filter. A version string without `t`
+continues to select regular builds unless `freethreaded=True` is given.
+
 ## CLI Usage
 
 In addition, FindPython provides a CLI interface to find python versions:
