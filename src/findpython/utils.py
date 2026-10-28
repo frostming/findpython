@@ -134,13 +134,15 @@ if TYPE_CHECKING:
 
 
 def parse_major(version: str) -> VersionDict | None:
-    """Parse the version dict from the version string"""
-    match = VERSION_RE.match(version)
+    """Parse a complete version criterion into matcher fields."""
+    match = VERSION_RE.fullmatch(version)
     if not match:
         return None
     rv = match.groupdict()
-    rv["pre"] = bool(rv.pop("prerel"))
-    rv["dev"] = bool(rv.pop("dev"))
+    prerelease = rv.pop("prerel")
+    devrelease = rv.pop("dev")
+    rv["dev"] = bool(devrelease) or prerelease == "dev"
+    rv["pre"] = bool(prerelease) or rv["dev"]
     rv["freethreaded"] = bool(rv.pop("freethreaded"))
     for int_values in ("major", "minor", "patch"):
         if rv[int_values] is not None:
